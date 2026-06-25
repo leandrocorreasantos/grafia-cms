@@ -1,0 +1,47 @@
+# Dependências
+node_modules/
+.pnp/
+.pnp.js
+
+# Build
+dist/
+build/
+.next/
+out/
+
+# Banco de dados
+*.db
+*.sqlite
+*.sqlite3
+
+# Ambiente
+.env
+.env.local
+.env.*.local
+*.env
+.env.development
+.env.production
+
+# Docker
+postgres_data/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Testes
+coverage/
+
+# Prisma
+*.prisma-migrate
+*.prisma-client
