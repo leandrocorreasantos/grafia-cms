@@ -1,0 +1,26 @@
+{
+    "name": "grafia-cms",
+    "version": "0.1.0",
+    "private": true,
+    "description": "Grafia CMS - Onde suas palavras ganham forma",
+    "workspaces": [
+        "apps/*",
+        "packages/*"
+    ],
+    "scripts": {
+        "dev": "concurrently \"npm run dev:api\" \"npm run dev:web\"",
+        "dev:api": "npm run dev --workspace=apps/api",
+        "dev:web": "npm run dev --workspace=apps/web",
+        "build": "npm run build --workspaces",
+        "db:generate": "npm run db:generate --workspace=apps/api",
+        "db:migrate": "npm run db:migrate --workspace=apps/api",
+        "db:studio": "npm run db:studio --workspace=apps/api",
+        "docker:up": "docker compose up -d",
+        "docker:down": "docker compose down"
+    },
+    "devDependencies": {
+        "@types/node": "^20.19.43",
+        "concurrently": "^8.2.0",
+        "typescript": "^5.0.0"
+    }
+}
