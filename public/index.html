@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Grafia CMS - Onde suas palavras ganham forma">
+    <title>Grafia CMS</title>
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+    <link rel="stylesheet" href="/assets/css/styles.css">
+</head>
+<body>
+    <div id="root">
+        <main class="container">
+            <header>
+                <h1>✍️ Grafia CMS</h1>
+                <p class="subtitle">Onde suas palavras ganham forma</p>
+            </header>
+
+            <section class="status-card">
+                <div class="status-indicator" id="statusIndicator"></div>
+                <h2>Status do Servidor</h2>
+                <p id="serverStatus">Verificando...</p>
+            </section>
+
+            <section class="info-cards">
+                <div class="card">
+                    <h3>🚀 API</h3>
+                    <p><a href="/api" target="_blank">/api</a></p>
+                </div>
+                <div class="card">
+                    <h3>🔋 Health</h3>
+                    <p><a href="/health" target="_blank">/health</a></p>
+                </div>
+                <div class="card">
+                    <h3>📚 Admin</h3>
+                    <p><a href="/admin" target="_blank">/admin</a></p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        async function checkHealth() {
+            try {
+                const response = await fetch('/health');
+                const data = await response.json();
+                const indicator = document.getElementById('statusIndicator');
+                const statusText = document.getElementById('serverStatus');
+
+                if (data.status === 'ok') {
+                    indicator.className = 'status-indicator online';
+                    statusText.textContent = `✅ Online - v${data.version} (${data.environment})`;
+                }
+            } catch (err) {
+                document.getElementById('statusIndicator').className = 'status-indicator offline';
+                document.getElementById('serverStatus').textContent = '❌ Offline';
+            }
+        }
+
+        checkHealth();
+        setInterval(checkHealth, 30000);
+    </script>
+</body>
+</html>
