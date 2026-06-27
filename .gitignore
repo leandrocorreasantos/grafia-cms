@@ -45,3 +45,15 @@ coverage/
 # Prisma
 *.prisma-migrate
 *.prisma-client
+
+# Conteúdo do usuário
+content/uploads/*
+!content/uploads/.gitkeep
+content/themes/*
+!content/themes/.gitkeep
+content/plugins/*
+!content/plugins/.gitkeep
+
+# Dados locais
+data/*
+!data/.gitkeep
