@@ -10,7 +10,7 @@
 //   grafia security   - Verificar segurança
 // ============================================
 
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import path from 'path';
 
@@ -62,7 +62,7 @@ function runScript(scriptName, args = []) {
   }
 
   try {
-    execSync(`node ${scriptPath}`, {
+    execFileSync('node', [scriptPath], {
       cwd: rootDir,
       stdio: 'inherit',
       env
