@@ -1,0 +1,47 @@
+# ============================================
+# GRAFIA CMS - APACHE CONFIG
+# ============================================
+# Use apenas se estiver usando Apache como proxy reverso
+# para o Node.js (porta 3000)
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Redirecionar para Node.js
+  RewriteCond %{REQUEST_URI} !^/assets/
+  RewriteCond %{REQUEST_URI} !^/content/
+  RewriteCond %{REQUEST_URI} !^/health
+  RewriteRule ^(.*)$ http://localhost:3000/$1 [P,L]
+</IfModule>
+
+# Segurança - Bloquear acesso a arquivos sensíveis
+<FilesMatch "\.(env|json|log|md)$">
+  Order allow,deny
+  Deny from all
+</FilesMatch>
+
+# Bloquear acesso ao diretório de dados
+<IfModule mod_autoindex.c>
+  Options -Indexes
+</IfModule>
+
+# Cache para arquivos estáticos (1 ano)
+<FilesMatch "\.(css|js|jpg|jpeg|png|gif|ico|webp|svg|woff2?)$">
+  Header set Cache-Control "public, max-age=31536000, immutable"
+</FilesMatch>
+
+# Compressão Gzip
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css
+  AddOutputFilterByType DEFLATE text/javascript application/javascript
+  AddOutputFilterByType DEFLATE application/json application/xml
+  AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+# Headers de segurança
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set X-XSS-Protection "1; mode=block"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
