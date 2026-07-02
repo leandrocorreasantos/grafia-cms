@@ -1,6 +1,6 @@
 import { Post } from '../../domain/post/Post';
 import { PostStatus } from '../../domain/post/PostStatus';
-import { IPostRepository } from '../../infrastructure/repositories/PostRepository';
+import { IPostRepository } from '../../domain/post/IPostRepository';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface CreatePostInput {

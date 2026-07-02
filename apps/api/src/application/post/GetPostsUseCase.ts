@@ -1,5 +1,5 @@
 import { Post } from '../../domain/post/Post';
-import { IPostRepository } from '../../infrastructure/repositories/PostRepository';
+import { IPostRepository } from '../../domain/post/IPostRepository';
 
 export interface GetPostsInput {
     limit?: number;

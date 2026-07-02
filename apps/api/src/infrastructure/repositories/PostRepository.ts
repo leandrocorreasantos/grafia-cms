@@ -1,16 +1,10 @@
 import { PrismaClient } from '@prisma/client';
 import { Post } from '../../domain/post/Post';
 import { PostStatus } from '../../domain/post/PostStatus';
+import { IPostRepository } from '../../domain/post/IPostRepository';
 
 // Tipo que representa o retorno do banco para o modelo Post
 type PrismaPost = Awaited<ReturnType<PrismaClient['post']['findUnique']>>;
-
-export interface IPostRepository {
-    save(post: Post): Promise<void>;
-    findById(id: string): Promise<Post | null>;
-    findAll(limit?: number, offset?: number): Promise<Post[]>;
-    delete(id: string): Promise<void>;
-}
 
 export class PrismaPostRepository implements IPostRepository {
     constructor(private readonly prisma: PrismaClient) { }
@@ -70,6 +64,11 @@ export class PrismaPostRepository implements IPostRepository {
         return data ? this.toDomain(data) : null;
     }
 
+    async findBySlug(slug: string): Promise<Post | null> {
+        const data = await this.prisma.post.findUnique({ where: { slug } });
+        return data ? this.toDomain(data) : null;
+    }
+
     async findAll(limit: number = 50, offset: number = 0): Promise<Post[]> {
         const posts = await this.prisma.post.findMany({
             skip: offset,
@@ -77,6 +76,18 @@ export class PrismaPostRepository implements IPostRepository {
             orderBy: { createdAt: 'desc' }
         });
         return posts.map((post: NonNullable<PrismaPost>) => this.toDomain(post));
+    }
+
+    async findByAuthorId(authorId: string): Promise<Post[]> {
+        const posts = await this.prisma.post.findMany({
+            where: { authorId },
+            orderBy: { createdAt: 'desc' }
+        });
+        return posts.map((post: NonNullable<PrismaPost>) => this.toDomain(post));
+    }
+
+    async count(): Promise<number> {
+        return this.prisma.post.count();
     }
 
     async delete(id: string): Promise<void> {
