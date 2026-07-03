@@ -5,18 +5,18 @@
         "module": "Node16",
         "moduleResolution": "node16",
         "outDir": "./dist",
-        "rootDir": "./src",
+        "rootDir": ".",
         "paths": {
-            "@/*": ["./*"],
-            "@domain/*": ["./domain/*"],
-            "@application/*": ["./application/*"],
-            "@infrastructure/*": ["./infrastructure/*"]
+            "@/*": ["./src/*"],
+            "@domain/*": ["./src/domain/*"],
+            "@application/*": ["./src/application/*"],
+            "@infrastructure/*": ["./src/infrastructure/*"]
         },
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
-        "noEmit": false,
-        "types": ["node"]
+        "noEmit": true,
+        "types": ["node", "jest"]
     },
-    "include": ["src/**/*.ts"],
+    "include": ["src/**/*.ts", "tests/**/*.ts"],
     "exclude": ["node_modules", "dist", "prisma"]
 }

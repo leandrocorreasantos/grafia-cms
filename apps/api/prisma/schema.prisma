@@ -33,5 +33,20 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  posts Post[]
+  posts                 Post[]
+  applicationPasswords ApplicationPassword[]
+}
+
+model ApplicationPassword {
+  id           String    @id @default(cuid())
+  userId       String
+  name         String
+  passwordHash String
+  lastUsedAt   DateTime?
+  expiresAt    DateTime?
+  createdAt    DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, name])
 }
