@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 48" fill="none">
+  <!-- Background -->
+  <rect width="48" height="48" rx="10" fill="#c41a1a"/>
+  <!-- Letra G -->
+  <text x="7" y="35" font-size="32" font-weight="800" fill="#fff" font-family="Inter, sans-serif">G</text>
+  <!-- Nome Grafia CMS -->
+  <text x="60" y="32" font-size="20" font-weight="800" fill="#1a1a1a" font-family="Inter, sans-serif">Grafia</text>
+  <text x="60" y="46" font-size="12" font-weight="500" fill="#c41a1a" font-family="Inter, sans-serif" letter-spacing="2">CMS</text>
+</svg>
