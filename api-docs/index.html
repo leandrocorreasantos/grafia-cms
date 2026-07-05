@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Docs - Grafia CMS</title>
+    <meta name="description" content="Documentação interativa da API REST do Grafia CMS — OpenAPI 3.0 / Redoc.">
+    <meta property="og:title" content="API Docs - Grafia CMS">
+    <meta property="og:description" content="Documentação interativa da API REST do Grafia CMS.">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="../assets/img/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        body { margin: 0; padding: 0; background: #fff; }
+        .api-header {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            background: rgba(255,255,255,.95); backdrop-filter: blur(10px);
+            border-bottom: 1px solid #e2e8f0; height: 64px;
+            display: flex; align-items: center; padding: 0 1.5rem;
+        }
+        .api-header .container { display: flex; align-items: center; justify-content: space-between; height: 64px; max-width: 1200px; margin: 0 auto; width: 100%; }
+        .api-header .logo { display: flex; align-items: center; gap: .5rem; font-weight: 800; font-size: 1.25rem; color: #1a1a1a; text-decoration: none; }
+        .api-header .logo:hover { color: #c41a1a; }
+        .api-header .logo-img { width: 32px; height: 32px; }
+        .api-header nav { display: flex; gap: .25rem; }
+        .api-header nav a { padding: .5rem .875rem; border-radius: 6px; font-size: .875rem; font-weight: 500; color: #475569; text-decoration: none; }
+        .api-header nav a:hover { background: #f1f5f9; color: #1a1a1a; }
+        #redoc-container { margin-top: 64px; min-height: calc(100vh - 64px); }
+    </style>
+</head>
+<body>
+
+    <!-- Header específico para API Docs -->
+    <header class="api-header">
+        <div class="container">
+            <a href="../index.html" class="logo">
+                <svg class="logo-img" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="32" height="32" rx="6" fill="#c41a1a"/>
+                    <text x="5" y="23" font-size="18" font-weight="800" fill="#fff" font-family="Inter">G</text>
+                </svg>
+                Grafia CMS
+            </a>
+            <nav>
+                <a href="../index.html">Home</a>
+                <a href="../roadmap.html">Roadmap</a>
+                <a href="../changelog.html">Changelog</a>
+                <a href="../contributing.html">Contribuir</a>
+                <a href="../api-docs/index.html" style="color:#c41a1a;font-weight:600;">API Docs</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Container Redoc -->
+    <div id="redoc-container"></div>
+
+    <script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"></script>
+    <script>
+        var redocSpec = '../api-docs/openapi.yaml';
+        // Tentar carregar do caminho relativo; fallback para o mesmo diretório
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', redocSpec, true);
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                try {
+                    var spec = JSON.parse(xhr.responseText);
+                    initRedoc(spec);
+                } catch (e) {
+                    // É YAML, carregar como string
+                    initRedoc(redocSpec);
+                }
+            } else {
+                // Fallback: tentar caminho relativo ao diretório atual
+                initRedoc('openapi.yaml');
+            }
+        };
+        xhr.onerror = function () {
+            initRedoc('openapi.yaml');
+        };
+        xhr.send();
+
+        function initRedoc(spec) {
+            Redoc.init(spec, {
+                scrollYOffset: 64,
+                hideDownloadButton: false,
+                expandResponses: '200,201',
+                pathInMiddlePanel: true,
+                nativeScrollbars: true,
+                theme: {
+                    colors: {
+                        primary: { main: '#c41a1a' },
+                        success: { main: '#16a34a' },
+                        error: { main: '#dc2626' },
+                        warning: { main: '#c9a84c' }
+                    },
+                    sidebar: {
+                        backgroundColor: '#fafafa',
+                        textColor: '#1a1a1a',
+                        activeTextColor: '#c41a1a',
+                        groupItems: { activeBackgroundColor: '#c41a1a10' }
+                    },
+                    rightPanel: {
+                        backgroundColor: '#1a1a1a',
+                        textColor: '#e2e8f0'
+                    },
+                    typography: {
+                        fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
+                        fontSize: '14px',
+                        headings: { fontFamily: 'Inter, sans-serif', fontWeight: '700' },
+                        code: { fontFamily: '"JetBrains Mono", "Fira Code", monospace' }
+                    },
+                    logo: { gutter: '16px' },
+                    schema: { nestedBackground: '#f8fafc' }
+                }
+            }, document.getElementById('redoc-container'));
+        }
+    </script>
+</body>
+</html>

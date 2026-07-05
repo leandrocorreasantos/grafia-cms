@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contribuindo - Grafia CMS</title>
+    <meta name="description" content="Guia de contribuição para o Grafia CMS — Saiba como contribuir com o projeto.">
+    <meta property="og:title" content="Contribuindo - Grafia CMS">
+    <meta property="og:description" content="Guia de contribuição para o Grafia CMS.">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="assets/img/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <svg class="logo-img" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="32" height="32" rx="6" fill="#c41a1a"/>
+                    <text x="5" y="23" font-size="18" font-weight="800" fill="#fff" font-family="Inter">G</text>
+                </svg>
+                Grafia CMS
+            </a>
+            <button class="nav-toggle" aria-label="Abrir menu" aria-expanded="false">
+                <span></span><span></span><span></span>
+            </button>
+            <nav class="nav">
+                <a href="index.html#features">Features</a>
+                <a href="roadmap.html">Roadmap</a>
+                <a href="changelog.html">Changelog</a>
+                <a href="contributing.html" class="active">Contribuir</a>
+                <a href="api-docs/index.html">API Docs</a>
+                <a href="https://github.com/leandrocorreasantos/grafia-cms" target="_blank">GitHub</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1>Contribuindo</h1>
+            <p>Guia para contribuidores do Grafia CMS.</p>
+        </div>
+    </section>
+
+    <!-- Content -->
+    <section class="page-section">
+        <div class="container">
+            <div class="content-page">
+
+                <p>Primeiramente, obrigado pelo interesse em contribuir com o <strong>Grafia CMS</strong>! 🎉</p>
+                <p>Este documento contém as diretrizes para contribuir com o projeto. Siga estas orientações para manter a qualidade e consistência do código.</p>
+
+                <h2>Como Contribuir</h2>
+
+                <h3>1. Reportando Issues</h3>
+                <p>Antes de abrir uma issue, verifique se já não existe uma issue similar. Ao criar, inclua:</p>
+                <ul>
+                    <li>Descrição clara do problema ou sugestão</li>
+                    <li>Passos para reproduzir (se for bug)</li>
+                    <li>Comportamento esperado vs. atual</li>
+                    <li>Ambiente (SO, versão do Node.js, etc.)</li>
+                </ul>
+
+                <h3>2. Fazendo um Pull Request</h3>
+                <ol>
+                    <li>Faça um <strong>fork</strong> do repositório</li>
+                    <li>Crie uma branch a partir da <code>develop</code>: <code>git checkout -b feature/nome-da-feature</code></li>
+                    <li>Implemente suas alterações seguindo os padrões de código</li>
+                    <li>Adicione ou atualize os testes conforme necessário</li>
+                    <li>Execute a suite de testes: <code>npm test</code></li>
+                    <li>Faça o commit seguindo o padrão <a href="https://www.conventionalcommits.org/" target="_blank">Conventional Commits</a></li>
+                    <li>Abra um Pull Request para a branch <code>develop</code></li>
+                </ol>
+
+                <h3>3. Conventional Commits</h3>
+                <p>Usamos o padrão <strong>Conventional Commits</strong> para mensagens de commit:</p>
+                <pre><code>feat: adiciona autenticação por Application Password
+^--^  ^------------------------------------^
+|     |
+|     +--&gt; Descrição no imperativo
+|
++--&gt; Tipo: feat, fix, test, docs, refactor, chore, style</code></pre>
+                <p>Tipos comuns:</p>
+                <ul>
+                    <li><code>feat</code> — Nova funcionalidade</li>
+                    <li><code>fix</code> — Correção de bug</li>
+                    <li><code>test</code> — Testes</li>
+                    <li><code>docs</code> — Documentação</li>
+                    <li><code>refactor</code> — Refatoração</li>
+                    <li><code>chore</code> — Tarefas de build/config</li>
+                </ul>
+
+                <h2>Padrões de Código</h2>
+
+                <h3>DDD & Clean Architecture</h3>
+                <p>O projeto segue estritamente os princípios de <strong>Domain-Driven Design</strong> e <strong>Clean Architecture</strong>:</p>
+                <div class="structure-tree">
+                    <span class="dir">src/</span><br>
+                    ├── <span class="dir">domain/</span>    # Entidades, Value Objects, Interfaces<br>
+                    │   ├── user/<br>
+                    │   ├── post/<br>
+                    │   └── errors/<br>
+                    ├── <span class="dir">application/</span> # Use Cases (casos de uso)<br>
+                    │   ├── auth/<br>
+                    │   ├── user/<br>
+                    │   └── post/<br>
+                    ├── <span class="dir">infrastructure/</span> # Implementações concretas<br>
+                    │   ├── auth/  (JWT, bcrypt)<br>
+                    │   └── database/ (Prisma)<br>
+                    └── <span class="dir">interfaces/</span>    # HTTP, Middlewares, Rotas<br>
+                        ├── http/<br>
+                        ├── routes/<br>
+                        └── middlewares/
+                </div>
+
+                <h3>Regras Gerais</h3>
+                <ul>
+                    <li><strong>TypeScript estrito</strong> — Sem <code>any</code> a menos que absolutamente necessário</li>
+                    <li><strong>Imutabilidade</strong> — Prefira <code>const</code>, <code>readonly</code> e métodos que retornam novos objetos</li>
+                    <li><strong>Nomes em inglês</strong> — Código e comentários em inglês</li>
+                    <li><strong>Testes</strong> — Todo código novo deve ter testes unitários e/ou de integração</li>
+                    <li><strong>Sem dependências circulares</strong> — As camadas dependem para dentro (domain &lt;- application &lt;- infrastructure &lt;- interfaces)</li>
+                </ul>
+
+                <h3>Estilo de Código</h3>
+                <ul>
+                    <li>2 espaços para indentação</li>
+                    <li>Ponto e vírgula obrigatório</li>
+                    <li>Aspas simples para strings</li>
+                    <li>Nomes de classes em <code>PascalCase</code></li>
+                    <li>Nomes de funções/variáveis em <code>camelCase</code></li>
+                    <li>Interfaces prefixadas com <code>I</code> (ex: <code>IUserRepository</code>)</li>
+                </ul>
+
+                <h2>Como Rodar Localmente</h2>
+
+                <h3>Pré-requisitos</h3>
+                <ul>
+                    <li>Node.js 18+</li>
+                    <li>Docker e Docker Compose</li>
+                    <li>npm 9+</li>
+                </ul>
+
+                <h3>Passos</h3>
+                <pre><code># 1. Clone o repositório
+git clone https://github.com/leandrocorreasantos/grafia-cms.git
+cd grafia-cms
+
+# 2. Instale as dependências
+npm install
+
+# 3. Suba o banco de dados
+docker compose up -d
+
+# 4. Configure as variáveis de ambiente
+cp .env.example .env
+
+# 5. Execute as migrações
+cd apps/api
+npx prisma migrate dev
+
+# 6. Inicie o servidor de desenvolvimento
+npm run dev
+
+# 7. Execute os testes
+npm test</code></pre>
+
+                <h3>Comandos Úteis</h3>
+                <pre><code># Testes unitários
+npm run test:unit
+
+# Testes de integração
+npm run test:integration
+
+# Testes com cobertura
+npm run test:coverage
+
+# Compilação TypeScript
+npx tsc --noEmit
+
+# Lint
+npm run lint</code></pre>
+
+                <blockquote>
+                    Dúvidas? Abra uma <a href="https://github.com/leandrocorreasantos/grafia-cms/issues" target="_blank">issue</a> ou entre em contato!
+                </blockquote>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <h4>Grafia CMS</h4>
+                    <p style="font-size:.875rem">Onde suas palavras ganham forma.</p>
+                </div>
+                <div>
+                    <h4>Documentação</h4>
+                    <ul>
+                        <li><a href="index.html">Início</a></li>
+                        <li><a href="roadmap.html">Roadmap</a></li>
+                        <li><a href="changelog.html">Changelog</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Desenvolvimento</h4>
+                    <ul>
+                        <li><a href="contributing.html">Contribuir</a></li>
+                        <li><a href="api-docs/index.html">API Docs</a></li>
+                        <li><a href="https://github.com/leandrocorreasantos/grafia-cms" target="_blank">GitHub</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Tecnologias</h4>
+                    <ul>
+                        <li>TypeScript</li>
+                        <li>Node.js / Express</li>
+                        <li>Next.js</li>
+                        <li>Prisma / PostgreSQL</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                &copy; <span id="current-year"></span> Grafia CMS. MIT License.
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
