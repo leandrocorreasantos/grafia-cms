@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Changelog - Grafia CMS</title>
+    <meta name="description" content="Histórico de alterações do Grafia CMS — Acompanhe todas as versões e mudanças do projeto.">
+    <meta property="og:title" content="Changelog - Grafia CMS">
+    <meta property="og:description" content="Histórico de alterações do Grafia CMS.">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="assets/img/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <svg class="logo-img" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="32" height="32" rx="6" fill="#c41a1a"/>
+                    <text x="5" y="23" font-size="18" font-weight="800" fill="#fff" font-family="Inter">G</text>
+                </svg>
+                Grafia CMS
+            </a>
+            <button class="nav-toggle" aria-label="Abrir menu" aria-expanded="false">
+                <span></span><span></span><span></span>
+            </button>
+            <nav class="nav">
+                <a href="index.html#features">Features</a>
+                <a href="roadmap.html">Roadmap</a>
+                <a href="changelog.html" class="active">Changelog</a>
+                <a href="contributing.html">Contribuir</a>
+                <a href="api-docs/index.html">API Docs</a>
+                <a href="https://github.com/leandrocorreasantos/grafia-cms" target="_blank">GitHub</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1>Changelog</h1>
+            <p>Histórico de todas as versões e alterações do Grafia CMS.</p>
+        </div>
+    </section>
+
+    <!-- Changelog List -->
+    <section class="page-section">
+        <div class="container">
+            <div class="changelog-list">
+
+                <div class="changelog-item animate-on-scroll">
+                    <div class="version">
+                        v0.1.0
+                        <span class="tag tag-added">Lançamento</span>
+                    </div>
+                    <div class="date">15 de Junho de 2026</div>
+                    <ul>
+                        <li data-type="added">Core DDD com entidades User, Post, ApplicationPassword</li>
+                        <li data-type="added">API REST com Express.js + TypeScript</li>
+                        <li data-type="added">Autenticação JWT com suporte a Application Passwords</li>
+                        <li data-type="added">Controle de acesso baseado em cargos (RBAC)</li>
+                        <li data-type="added">CRUD completo de Posts e Usuários</li>
+                        <li data-type="added">Prisma ORM + PostgreSQL</li>
+                        <li data-type="added">Testes de integração (27 testes)</li>
+                        <li data-type="added">Testes unitários (71 testes)</li>
+                        <li data-type="added">Cobertura de testes: ~75%</li>
+                        <li data-type="added">Documentação da API com OpenAPI 3.0 + Redoc</li>
+                        <li data-type="added">Documentação do projeto (Roadmap, Changelog, Contributing)</li>
+                    </ul>
+                </div>
+
+                <div class="changelog-item animate-on-scroll">
+                    <div class="version">
+                        v0.0.1
+                        <span class="tag tag-added">Primeiro Commit</span>
+                    </div>
+                    <div class="date">1 de Junho de 2026</div>
+                    <ul>
+                        <li data-type="added">Inicialização do monorepo com Turborepo</li>
+                        <li data-type="added">Configuração do workspace apps/api e apps/web</li>
+                        <li data-type="added">Schema Prisma inicial (User e Post)</li>
+                        <li data-type="added">Estrutura DDD: domain, application, infrastructure, interfaces</li>
+                        <li data-type="added">Configuração Docker para PostgreSQL</li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <h4>Grafia CMS</h4>
+                    <p style="font-size:.875rem">Onde suas palavras ganham forma.</p>
+                </div>
+                <div>
+                    <h4>Documentação</h4>
+                    <ul>
+                        <li><a href="index.html">Início</a></li>
+                        <li><a href="roadmap.html">Roadmap</a></li>
+                        <li><a href="changelog.html">Changelog</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Desenvolvimento</h4>
+                    <ul>
+                        <li><a href="contributing.html">Contribuir</a></li>
+                        <li><a href="api-docs/index.html">API Docs</a></li>
+                        <li><a href="https://github.com/leandrocorreasantos/grafia-cms" target="_blank">GitHub</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Tecnologias</h4>
+                    <ul>
+                        <li>TypeScript</li>
+                        <li>Node.js / Express</li>
+                        <li>Next.js</li>
+                        <li>Prisma / PostgreSQL</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                &copy; <span id="current-year"></span> Grafia CMS. MIT License.
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>
