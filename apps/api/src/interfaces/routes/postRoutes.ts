@@ -8,7 +8,7 @@ import { UpdatePostUseCase } from '../../application/post/UpdatePostUseCase';
 import { DeletePostUseCase } from '../../application/post/DeletePostUseCase';
 import { PostController } from '../http/PostController';
 import { JwtService } from '../../infrastructure/auth/JwtService';
-import { authenticate } from '../middlewares/authMiddleware';
+import { authenticate, authenticateOptional } from '../middlewares/authMiddleware';
 import {
   publicPostRateLimit,
   privatePostRateLimit,
@@ -34,10 +34,20 @@ export function createPostRoutes(prisma: PrismaClient, jwtSecret: string): Route
   );
 
   // GET /api/posts - publico
-  router.get('/', publicPostRateLimit, (req, res, next) => postController.list(req, res, next));
+  router.get(
+    '/',
+    publicPostRateLimit,
+    authenticateOptional(jwtService),
+    (req, res, next) => postController.list(req, res, next),
+  );
 
   // GET /api/posts/:id - publico
-  router.get('/:id', publicPostRateLimit, (req, res, next) => postController.getById(req, res, next));
+  router.get(
+    '/:id',
+    publicPostRateLimit,
+    authenticateOptional(jwtService),
+    (req, res, next) => postController.getById(req, res, next),
+  );
 
   // POST /api/posts - autenticado (author+)
   router.post('/', privatePostRateLimit, authenticate(jwtService), (req, res, next) =>

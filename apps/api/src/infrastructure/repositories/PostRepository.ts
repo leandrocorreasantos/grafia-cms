@@ -78,6 +78,16 @@ export class PrismaPostRepository implements IPostRepository {
         return posts.map((post: NonNullable<PrismaPost>) => this.toDomain(post));
     }
 
+    async findPublished(limit: number = 50, offset: number = 0): Promise<Post[]> {
+        const posts = await this.prisma.post.findMany({
+            where: { status: PostStatus.PUBLISHED },
+            skip: offset,
+            take: limit,
+            orderBy: { createdAt: 'desc' }
+        });
+        return posts.map((post: NonNullable<PrismaPost>) => this.toDomain(post));
+    }
+
     async findByAuthorId(authorId: string): Promise<Post[]> {
         const posts = await this.prisma.post.findMany({
             where: { authorId },
