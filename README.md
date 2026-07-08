@@ -73,7 +73,7 @@ apps/api/src/
 
 ```bash
 # 1. Baixe o pacote
-wget https://github.com/leandro-matos/grafia-cms/releases/latest/download/grafia-cms.tar.gz
+wget https://github.com/leandrocorreasantos/grafia-cms/releases/latest/download/grafia-cms.tar.gz
 tar -xzf grafia-cms.tar.gz
 cd grafia-cms
 

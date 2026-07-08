@@ -1,0 +1,540 @@
+openapi: "3.0.3"
+info:
+  title: Grafia CMS API
+  description: |
+    API REST do Grafia CMS — Um CMS moderno construído com TypeScript,
+    DDD e Clean Architecture.
+
+    **Autenticação:** A API usa JWT Bearer Token. Obtenha um token
+    através do endpoint `/api/auth/login`.
+
+    **Cargos:** O sistema possui 4 níveis de acesso:
+    - `admin`: Acesso total
+    - `editor`: Pode gerenciar posts
+    - `author`: Pode criar e editar próprios posts
+    - `contributor`: Acesso limitado
+  version: "0.1.0"
+  contact:
+    name: Leandro Correa dos Santos
+    url: https://github.com/leandrocorreasantos/grafia-cms
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:3001/api
+    description: Desenvolvimento local
+  - url: https://api.grafiacms.com
+    description: Produção
+
+paths:
+  /auth/login:
+    post:
+      tags:
+        - Autenticação
+      summary: Autentica um usuário
+      description: |
+        Autentica com email+senha (login normal) ou com
+        email+senha+nomeApp (Application Password).
+        Retorna um token JWT.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginInput"
+      responses:
+        "200":
+          description: Login bem-sucedido
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginOutput"
+        "400":
+          description: Dados inválidos
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "401":
+          description: Credenciais inválidas
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /auth/me:
+    get:
+      tags:
+        - Autenticação
+      summary: Retorna dados do usuário autenticado
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Dados do usuário
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserOutput"
+        "401":
+          description: Token ausente ou inválido
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /auth/app-passwords:
+    post:
+      tags:
+        - Application Passwords
+      summary: Cria uma nova Application Password
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAppPasswordInput"
+      responses:
+        "201":
+          description: Application Password criada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppPasswordOutput"
+        "400":
+          description: Nome inválido (mín. 3 caracteres)
+        "409":
+          description: Nome duplicado para este usuário
+
+    get:
+      tags:
+        - Application Passwords
+      summary: Lista Application Passwords do usuário
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Lista de Application Passwords
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AppPasswordOutput"
+
+  /auth/app-passwords/{id}:
+    delete:
+      tags:
+        - Application Passwords
+      summary: Revoga (deleta) uma Application Password
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Application Password revogada
+        "404":
+          description: Application Password não encontrada
+
+  /posts:
+    get:
+      tags:
+        - Posts
+      summary: Lista todos os posts
+      description: Endpoint público — não requer autenticação.
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [draft, published, archived]
+      responses:
+        "200":
+          description: Lista de posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PostOutput"
+
+    post:
+      tags:
+        - Posts
+      summary: Cria um novo post
+      description: Requer cargo `author` ou superior.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePostInput"
+      responses:
+        "201":
+          description: Post criado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostOutput"
+        "400":
+          description: Dados inválidos
+        "401":
+          description: Token ausente
+        "403":
+          description: Cargo insuficiente
+
+  /posts/{id}:
+    put:
+      tags:
+        - Posts
+      summary: Atualiza um post existente
+      description: |
+        Requer cargo `editor` ou superior, ou `author`
+        (apenas próprio post).
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdatePostInput"
+      responses:
+        "200":
+          description: Post atualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostOutput"
+        "403":
+          description: Cargo insuficiente
+        "404":
+          description: Post não encontrado
+
+    delete:
+      tags:
+        - Posts
+      summary: Deleta um post
+      description: Requer cargo `editor` ou superior.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Post deletado
+        "403":
+          description: Cargo insuficiente
+        "404":
+          description: Post não encontrado
+
+  /users:
+    get:
+      tags:
+        - Usuários
+      summary: Lista todos os usuários
+      description: Requer cargo `admin`.
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Lista de usuários
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserOutput"
+        "403":
+          description: Cargo insuficiente
+
+    post:
+      tags:
+        - Usuários
+      summary: Cria um novo usuário
+      description: Requer cargo `admin`.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUserInput"
+      responses:
+        "201":
+          description: Usuário criado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserOutput"
+        "409":
+          description: Email já cadastrado
+
+  /users/{id}:
+    delete:
+      tags:
+        - Usuários
+      summary: Deleta um usuário
+      description: Requer cargo `admin`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Usuário deletado
+        "404":
+          description: Usuário não encontrado
+
+  /health:
+    get:
+      tags:
+        - Health
+      summary: Verifica status da API
+      responses:
+        "200":
+          description: API saudável
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Token JWT obtido no login (header `Authorization: Bearer &lt;token&gt;`)
+
+  schemas:
+    LoginInput:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: "admin@grafiacms.com"
+        password:
+          type: string
+          format: password
+          example: "senha123"
+        appName:
+          type: string
+          description: Nome da Application Password (para login via app password)
+          example: "Zapier"
+
+    LoginOutput:
+      type: object
+      properties:
+        token:
+          type: string
+          description: JWT token
+          example: "eyJhbGciOiJIUzI1NiIs..."
+        user:
+          $ref: "#/components/schemas/UserOutput"
+        type:
+          type: string
+          enum: [user, application]
+          description: Tipo de autenticação
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Mensagem de erro
+          example: "Credenciais inválidas"
+
+    UserOutput:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "cm7f8g5h..."
+        email:
+          type: string
+          format: email
+          example: "admin@grafiacms.com"
+        name:
+          type: string
+          example: "Admin"
+        role:
+          type: string
+          enum: [admin, editor, author, contributor]
+          example: "admin"
+        createdAt:
+          type: string
+          format: date-time
+
+    CreateUserInput:
+      type: object
+      required:
+        - email
+        - name
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: "novo@teste.com"
+        name:
+          type: string
+          minLength: 3
+          example: "Novo Usuário"
+        password:
+          type: string
+          format: password
+          minLength: 8
+          example: "senha123456"
+        role:
+          type: string
+          enum: [admin, editor, author, contributor]
+          default: author
+
+    PostOutput:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "cm7f8g5h..."
+        title:
+          type: string
+          example: "Meu Primeiro Post"
+        slug:
+          type: string
+          example: "meu-primeiro-post"
+        content:
+          type: string
+          example: "Conteúdo do post..."
+        excerpt:
+          type: string
+          example: "Resumo do post..."
+        status:
+          type: string
+          enum: [draft, published, archived]
+          example: "draft"
+        authorId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        publishedAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    CreatePostInput:
+      type: object
+      required:
+        - title
+        - content
+      properties:
+        title:
+          type: string
+          minLength: 3
+          example: "Meu Primeiro Post"
+        content:
+          type: string
+          minLength: 10
+          example: "Conteúdo completo do post..."
+        status:
+          type: string
+          enum: [draft, published]
+          default: draft
+
+    UpdatePostInput:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 3
+        content:
+          type: string
+          minLength: 10
+        status:
+          type: string
+          enum: [draft, published, archived]
+
+    CreateAppPasswordInput:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 3
+          description: Nome identificador da Application Password
+          example: "IntegracaoZapier"
+        expiresInDays:
+          type: integer
+          description: Dias até expirar (opcional)
+          example: 90
+
+    AppPasswordOutput:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        lastUsedAt:
+          type: string
+          format: date-time
+          nullable: true
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+        password:
+          type: string
+          description: Senha gerada (retornada apenas na criação)

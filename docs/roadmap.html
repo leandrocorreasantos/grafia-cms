@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roadmap - Grafia CMS</title>
+    <meta name="description" content="Roadmap do Grafia CMS — Acompanhe o planejamento e progresso do projeto.">
+    <meta property="og:title" content="Roadmap - Grafia CMS">
+    <meta property="og:description" content="Roadmap do Grafia CMS — Acompanhe o planejamento e progresso do projeto.">
+    <meta property="og:type" content="website">
+    <link rel="icon" href="assets/img/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <a href="index.html" class="logo">
+                <svg class="logo-img" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="32" height="32" rx="6" fill="#c41a1a"/>
+                    <text x="5" y="23" font-size="18" font-weight="800" fill="#fff" font-family="Inter">G</text>
+                </svg>
+                Grafia CMS
+            </a>
+            <button class="nav-toggle" aria-label="Abrir menu" aria-expanded="false">
+                <span></span><span></span><span></span>
+            </button>
+            <nav class="nav">
+                <a href="index.html#features">Features</a>
+                <a href="roadmap.html" class="active">Roadmap</a>
+                <a href="changelog.html">Changelog</a>
+                <a href="contributing.html">Contribuir</a>
+                <a href="api-docs/index.html">API Docs</a>
+                <a href="https://github.com/leandrocorreasantos/grafia-cms" target="_blank">GitHub</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1>Roadmap</h1>
+            <p>Acompanhe o planejamento e o progresso do Grafia CMS.</p>
+        </div>
+    </section>
+
+    <!-- Timeline -->
+    <section class="page-section">
+        <div class="container">
+            <div class="timeline">
+
+                <div class="timeline-item done animate-on-scroll">
+                    <div class="timeline-header">
+                        <h2>v1.0 — Lançamento Inicial</h2>
+                        <span class="date">Concluído</span>
+                        <span class="badge badge-green">100%</span>
+                    </div>
+                    <p>Primeira versão estável com o core do CMS baseado em DDD e Clean Architecture.</p>
+                    <ul>
+                        <li>✅ Core DDD — Entidades, Value Objects, Repositórios</li>
+                        <li>✅ API REST com Express.js + TypeScript</li>
+                        <li>✅ Autenticação JWT + Application Passwords</li>
+                        <li>✅ Controle de Acesso por Cargos (RBAC)</li>
+                        <li>✅ CRUD de Posts e Usuários</li>
+                        <li>✅ Prisma ORM + PostgreSQL</li>
+                        <li>✅ Testes de Integração (98 testes)</li>
+                        <li>✅ Documentação da API (OpenAPI 3.0)</li>
+                    </ul>
+                </div>
+
+                <div class="timeline-item wip animate-on-scroll">
+                    <div class="timeline-header">
+                        <h2>v1.1 — Temas & Editor</h2>
+                        <span class="date">Em desenvolvimento</span>
+                        <span class="badge badge-gold">~60%</span>
+                    </div>
+                    <p>Sistema de temas visuais e editor de conteúdo WYSIWYG.</p>
+                    <ul>
+                        <li>🔧 Sistema de Temas com Theme Manager</li>
+                        <li>🔧 Editor de conteúdo (TipTap/ProseMirror)</li>
+                        <li>🔧 Upload de imagens e mídia</li>
+                        <li>🔧 Geração de slugs automática</li>
+                        <li>🔧 Páginas estáticas (sobre, contato)</li>
+                        <li>🔧 Modo rascunho e agendamento</li>
+                    </ul>
+                </div>
+
+                <div class="timeline-item todo animate-on-scroll">
+                    <div class="timeline-header">
+                        <h2>v1.2 — Plugins & Webhooks</h2>
+                        <span class="date">Planejado</span>
+                        <span class="badge badge-gray">0%</span>
+                    </div>
+                    <p>Sistema de plugins extensível e integrações via webhooks.</p>
+                    <ul>
+                        <li>📋 Sistema de Plugins (Plugin API + Hooks)</li>
+                        <li>📋 Webhooks para eventos do CMS</li>
+                        <li>📋 Cache com Redis</liajeito>
+                        <li>📋 Filas de processamento (Bull/BullMQ)</liajeito>
+                        <li>📋 Notificações por email</li>
+                        <li>📋 Exportação/Importação de dados</li>
+                    </ul>
+                </div>
+
+                <div class="timeline-item todo animate-on-scroll">
+                    <div class="timeline-header">
+                        <h2>v2.0 — GraphQL & Multi-idioma</h2>
+                        <span class="date">Planejado</span>
+                        <span class="badge badge-gray">0%</span>
+                    </div>
+                    <p>API GraphQL com suporte a múltiplos idiomas.</p>
+                    <ul>
+                        <li>📋 API GraphQL (Apollo/Relay)</li>
+                        <li>📋 Suporte multi-idioma (i18n)</li>
+                        <li>📋 Moderação de conteúdo</li>
+                        <li>📋 Analytics integrado</li>
+                        <li>📋 CLI para gerenciamento</li>
+                        <li>📋 SSO (OAuth 2.0 / SAML)</li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <h4>Grafia CMS</h4>
+                    <p style="font-size:.875rem">Onde suas palavras ganham forma.</p>
+                </div>
+                <div>
+                    <h4>Documentação</h4>
+                    <ul>
+                        <li><a href="index.html">Início</a></li>
+                        <li><a href="roadmap.html">Roadmap</a></li>
+                        <li><a href="changelog.html">Changelog</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Desenvolvimento</h4>
+                    <ul>
+                        <li><a href="contributing.html">Contribuir</a></li>
+                        <li><a href="api-docs/index.html">API Docs</a></li>
+                        <li><a href="https://github.com/leandrocorreasantos/grafia-cms" target="_blank">GitHub</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Tecnologias</h4>
+                    <ul>
+                        <li>TypeScript</li>
+                        <li>Node.js / Express</li>
+                        <li>Next.js</li>
+                        <li>Prisma / PostgreSQL</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                &copy; <span id="current-year"></span> Grafia CMS. MIT License.
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+</body>
+</html>

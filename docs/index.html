@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+    <html lang="pt-BR">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Grafia CMS — Onde suas palavras ganham forma</title>
+        <meta name="description"
+            content="Grafia CMS — Um CMS moderno construído com TypeScript, DDD e Clean Architecture. API REST, RBAC, Application Passwords e muito mais.">
+        <meta property="og:title" content="Grafia CMS — Onde suas palavras ganham forma">
+        <meta property="og:description" content="Um CMS moderno construído com TypeScript, DDD e Clean Architecture.">
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="https://grafiacms.com">
+        <meta name="twitter:card" content="summary_large_image">
+        <link rel="icon" href="assets/img/favicon.ico">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+            rel="stylesheet">
+        <link rel="stylesheet" href="css/style.css">
+    </head>
+
+    <body>
+
+        <!-- Header -->
+        <header class="header">
+            <div class="container">
+                <a href="index.html" class="logo">
+                    <svg class="logo-img" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="32" height="32" rx="6" fill="#c41a1a" />
+                        <text x="5" y="23" font-size="18" font-weight="800" fill="#fff" font-family="Inter">G</text>
+                    </svg>
+                    Grafia CMS
+                </a>
+                <button class="nav-toggle" aria-label="Abrir menu" aria-expanded="false">
+                    <span></span><span></span><span></span>
+                </button>
+                <nav class="nav">
+                    <a href="#features">Features</a>
+                    <a href="roadmap.html">Roadmap</a>
+                    <a href="changelog.html">Changelog</a>
+                    <a href="contributing.html">Contribuir</a>
+                    <a href="api-docs/index.html">API Docs</a>
+                    <a href="https://github.com/leandrocorreasantos/grafia-cms" target="_blank">GitHub</a>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Hero -->
+        <section class="hero">
+            <div class="container">
+                <h1>Onde suas <em>palavras</em> ganham forma</h1>
+                <p>Um CMS moderno, construído com TypeScript, DDD e Clean Architecture. Flexível, extensível e preparado
+                    para o futuro.</p>
+                <div class="hero-actions">
+                    <a href="#install" class="btn btn-primary">⚡ Instalar Agora</a>
+                    <a href="https://github.com/leandrocorreasantos/grafia-cms" target="_blank" class="btn btn-outline">Ver no
+                        GitHub</a>
+                </div>
+                <div class="hero-badges">
+                    <span class="badge badge-red">TypeScript</span>
+                    <span class="badge badge-gold">DDD</span>
+                    <span class="badge badge-green">Clean Arch</span>
+                    <span class="badge badge-gray">Prisma</span>
+                    <span class="badge badge-gray">JWT</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features -->
+        <section class="features section" id="features">
+            <div class="container">
+                <div class="section-title">
+                    <span>Por que Grafia?</span>
+                    <h2>Feito para quem <em>escreve</em></h2>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card animate-on-scroll">
+                        <div class="feature-icon red">🏗️</div>
+                        <h3>Arquitetura DDD</h3>
+                        <p>Domain-Driven Design com Clean Architecture. Código organizado em camadas: domain,
+                            application, infrastructure e interfaces.</p>
+                    </div>
+                    <div class="feature-card animate-on-scroll">
+                        <div class="feature-icon gold">🔌</div>
+                        <h3>Sistema de Plugins</h3>
+                        <p>Arquitetura extensível com suporte a plugins. Crie suas próprias extensões sem modificar o
+                            core do CMS.</p>
+                    </div>
+                    <div class="feature-card animate-on-scroll">
+                        <div class="feature-icon dark">🎨</div>
+                        <h3>Temas Customizáveis</h3>
+                        <p>Sistema de temas completo com Theme Manager. Troque a aparência do seu site sem tocar no
+                            conteúdo.</p>
+                    </div>
+                    <div class="feature-card animate-on-scroll">
+                        <div class="feature-icon red">⚡</div>
+                        <h3>Headless Ready</h3>
+                        <p>API REST completa com OpenAPI 3.0. Consuma o conteúdo de qualquer frontend: React, Next.js,
+                            Vue ou mobile.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Install -->
+        <section class="install section" id="install">
+            <div class="container">
+                <div class="section-title">
+                    <span>Comece agora</span>
+                    <h2>Instalação Rápida</h2>
+                </div>
+                <div class="install-code">
+                    <button class="copy-btn" aria-label="Copiar">📋 Copiar</button>
+                    <pre><span class="comment"># Clone o repositório</span>
+<span class="prompt">$</span> <span class="cmd">git clone https://github.com/leandrocorreasantos/grafia-cms.git</span>
+<span class="prompt">$</span> <span class="cmd">cd grafia-cms</span>
+
+<span class="comment"># Instale as dependências</span>
+<span class="prompt">$</span> <span class="cmd">npm install</span>
+
+<span class="comment"># Inicie o banco de dados</span>
+<span class="prompt">$</span> <span class="cmd">docker compose up -d</span>
+
+<span class="comment"># Execute as migrações e inicie</span>
+<span class="prompt">$</span> <span class="cmd">cd apps/api && npx prisma migrate dev</span>
+<span class="prompt">$</span> <span class="cmd">npm run dev</span></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Roadmap Preview -->
+        <section class="roadmap-preview section">
+            <div class="container">
+                <div class="section-title">
+                    <span>O que vem por aí</span>
+                    <h2>Roadmap</h2>
+                </div>
+                <div class="roadmap-grid">
+                    <div class="roadmap-col done animate-on-scroll">
+                        <h3>✅ v1.0 — Concluído</h3>
+                        <ul>
+                            <li><span class="icon">✅</span> Core DDD + Clean Architecture</li>
+                            <li><span class="icon">✅</span> API REST com Express</li>
+                            <li><span class="icon">✅</span> Autenticação JWT + RBAC</li>
+                            <li><span class="icon">✅</span> Prisma + PostgreSQL</li>
+                            <li><span class="icon">✅</span> 98 Testes automatizados</li>
+                        </ul>
+                    </div>
+                    <div class="roadmap-col wip animate-on-scroll">
+                        <h3>🔧 v1.1 — Em andamento</h3>
+                        <ul>
+                            <li><span class="icon">🔧</span> Sistema de Temas</li>
+                            <li><span class="icon">🔧</span> Editor WYSIWYG</li>
+                            <li><span class="icon">🔧</span> Upload de mídia</li>
+                            <li><span class="icon">🔧</span> Páginas estáticas</li>
+                        </ul>
+                    </div>
+                    <div class="roadmap-col todo animate-on-scroll">
+                        <h3>📋 v1.2 — Planejado</h3>
+                        <ul>
+                            <li><span class="icon">📋</span> Sistema de Plugins</li>
+                            <li><span class="icon">📋</span> Webhooks</li>
+                            <li><span class="icon">📋</span> Cache com Redis</li>
+                            <li><span class="icon">📋</span> Filas (BullMQ)</li>
+                        </ul>
+                    </div>
+                </div>
+                <div style="text-align:center;margin-top:2rem">
+                    <a href="roadmap.html" class="btn btn-outline">Ver Roadmap Completo →</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Changelog Preview -->
+        <section class="changelog-preview section">
+            <div class="container">
+                <div class="section-title">
+                    <span>Últimas novidades</span>
+                    <h2>Changelog</h2>
+                </div>
+                <div class="changelog-entry animate-on-scroll">
+                    <div class="version">v0.1.0</div>
+                    <div class="date">15 de Junho de 2026</div>
+                    <ul>
+                        <li>Core DDD com entidades User, Post e ApplicationPassword</li>
+                        <li>API REST com Express.js + TypeScript</li>
+                        <li>Autenticação JWT + Application Passwords</li>
+                        <li>Controle de acesso RBAC (admin, editor, author, contributor)</li>
+                        <li>Testes de integração e unitários (98 testes, ~75% cobertura)</li>
+                        <li>Documentação OpenAPI 3.0 + Redoc</li>
+                    </ul>
+                </div>
+                <div style="text-align:center;margin-top:2rem">
+                    <a href="changelog.html" class="btn btn-outline">Ver Changelog Completo →</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-grid">
+                    <div>
+                        <h4>Grafia CMS</h4>
+                        <p style="font-size:.875rem">Onde suas palavras ganham forma.</p>
+                    </div>
+                    <div>
+                        <h4>Documentação</h4>
+                        <ul>
+                            <li><a href="index.html">Início</a></li>
+                            <li><a href="roadmap.html">Roadmap</a></li>
+                            <li><a href="changelog.html">Changelog</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4>Desenvolvimento</h4>
+                        <ul>
+                            <li><a href="contributing.html">Contribuir</a></li>
+                            <li><a href="api-docs/index.html">API Docs</a></li>
+                            <li><a href="https://github.com/leandrocorreasantos/grafia-cms" target="_blank">GitHub</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4>Tecnologias</h4>
+                        <ul>
+                            <li>TypeScript</li>
+                            <li>Node.js / Express</li>
+                            <li>Next.js</li>
+                            <li>Prisma / PostgreSQL</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    &copy; <span id="current-year"></span> Grafia CMS. MIT License.
+                </div>
+            </div>
+        </footer>
+
+        <script src="js/main.js"></script>
+    </body>
+
+    </html>
