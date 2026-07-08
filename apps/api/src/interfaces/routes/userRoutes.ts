@@ -5,6 +5,10 @@ import { UserController } from '../http/UserController';
 import { JwtService } from '../../infrastructure/auth/JwtService';
 import { authenticate, requireRole } from '../middlewares/authMiddleware';
 import { UserRole } from '../../domain/user/UserRole';
+import {
+  publicUserRateLimit,
+  privateUserRateLimit,
+} from '../middlewares/rateLimitMiddleware';
 
 export function createUserRoutes(prisma: PrismaClient, jwtSecret: string): Router {
   const router = Router();
@@ -13,11 +17,12 @@ export function createUserRoutes(prisma: PrismaClient, jwtSecret: string): Route
   const jwtService = new JwtService(jwtSecret);
 
   // POST /api/users - publico (registro)
-  router.post('/', (req, res, next) => userController.create(req, res, next));
+  router.post('/', publicUserRateLimit, (req, res, next) => userController.create(req, res, next));
 
   // GET /api/users - protegido (editor+)
   router.get(
     '/',
+    privateUserRateLimit,
     authenticate(jwtService),
     requireRole(UserRole.EDITOR),
     (req, res, next) => userController.list(req, res, next),
@@ -26,6 +31,7 @@ export function createUserRoutes(prisma: PrismaClient, jwtSecret: string): Route
   // GET /api/users/:id - protegido (editor+)
   router.get(
     '/:id',
+    privateUserRateLimit,
     authenticate(jwtService),
     requireRole(UserRole.EDITOR),
     (req, res, next) => userController.getById(req, res, next),
@@ -34,6 +40,7 @@ export function createUserRoutes(prisma: PrismaClient, jwtSecret: string): Route
   // DELETE /api/users/:id - protegido (admin)
   router.delete(
     '/:id',
+    privateUserRateLimit,
     authenticate(jwtService),
     requireRole(UserRole.ADMIN),
     (req, res, next) => userController.delete(req, res, next),

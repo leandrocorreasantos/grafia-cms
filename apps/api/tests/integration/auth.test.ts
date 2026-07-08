@@ -2,11 +2,12 @@ import request from 'supertest';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
+import { beforeAll, afterAll, describe, it, expect } from '@jest/globals';
 import { createTestApp, JWT_SECRET, seedAdmin } from '../helpers/test-utils';
 
-// ============================================
+/* ============================================
 // SETUP
-// ============================================
+ ============================================ */
 
 let prisma: PrismaClient;
 let app: ReturnType<typeof createTestApp>;

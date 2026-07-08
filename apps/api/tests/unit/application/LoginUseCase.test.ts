@@ -1,4 +1,5 @@
 import { LoginUseCase, LoginInput, LoginOutput } from '../../../src/application/auth/LoginUseCase';
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { IUserRepository } from '../../../src/domain/user/IUserRepository';
 import { User, UserData } from '../../../src/domain/user/User';
 import { UserRole } from '../../../src/domain/user/UserRole';
@@ -7,6 +8,36 @@ import { AuthenticationError } from '../../../src/domain/errors/DomainError';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 
+type LoginUserRepositoryMock = IUserRepository & {
+  findApplicationPassword: (
+    userId: string,
+    name: string,
+  ) => Promise<{ id: string; passwordHash: string } | null>;
+  saveApplicationPassword: (
+    userId: string,
+    name: string,
+    passwordHash: string,
+  ) => Promise<void>;
+  deleteApplicationPassword: (id: string) => Promise<void>;
+  listApplicationPasswords: (userId: string) => Promise<
+    Array<{ id: string; name: string; lastUsedAt: Date | null; createdAt: Date }>
+  >;
+  updateApplicationPasswordLastUsed: (id: string) => Promise<void>;
+};
+
+function getRequiredTestEnv(name: string): string {
+  const value = process.env[name];
+
+  if (!value) {
+    throw new Error(`Missing ${name} in .env.test`);
+  }
+
+  return value;
+}
+
+const TEST_USER_PASSWORD = getRequiredTestEnv('LOGIN_TEST_USER_PASSWORD');
+const TEST_APPLICATION_PASSWORD = getRequiredTestEnv('LOGIN_TEST_APPLICATION_PASSWORD');
+
 // Mock do JwtService
 const mockJwtService = {
   generateToken: jest.fn().mockReturnValue('jwt-token-mockado'),
@@ -14,7 +45,7 @@ const mockJwtService = {
 } as unknown as jest.Mocked<JwtService>;
 
 // Mock do UserRepository
-const mockUserRepository: jest.Mocked<IUserRepository> = {
+const mockUserRepository: jest.Mocked<LoginUserRepositoryMock> = {
   save: jest.fn(),
   findById: jest.fn(),
   findByEmail: jest.fn(),
@@ -34,7 +65,7 @@ function createUser(overrides: Partial<UserData> = {}): User {
     id: uuidv4(),
     email: 'user@teste.com',
     name: 'Usuário Teste',
-    passwordHash: bcrypt.hashSync('senha123', 10),
+    passwordHash: bcrypt.hashSync(TEST_USER_PASSWORD, 10),
     role: UserRole.AUTHOR,
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -55,7 +86,7 @@ describe('LoginUseCase', () => {
       const user = createUser();
       mockUserRepository.findByEmail.mockResolvedValue(user);
 
-      const result = await useCase.execute({ email: 'user@teste.com', password: 'senha123' });
+      const result = await useCase.execute({ email: 'user@teste.com', password: TEST_USER_PASSWORD });
 
       expect(result).toHaveProperty('token', 'jwt-token-mockado');
       expect(result).toHaveProperty('type', 'user');
@@ -69,7 +100,7 @@ describe('LoginUseCase', () => {
       const user = createUser({ email: 'user@teste.com' });
       mockUserRepository.findByEmail.mockResolvedValue(user);
 
-      await useCase.execute({ email: 'USER@TESTE.COM', password: 'senha123' });
+      await useCase.execute({ email: 'USER@TESTE.COM', password: TEST_USER_PASSWORD });
 
       expect(mockUserRepository.findByEmail).toHaveBeenCalledWith('user@teste.com');
     });
@@ -77,7 +108,7 @@ describe('LoginUseCase', () => {
     it('deve lancar AuthenticationError para email inexistente', async () => {
       mockUserRepository.findByEmail.mockResolvedValue(null);
 
-      await expect(useCase.execute({ email: 'naoexiste@teste.com', password: 'senha123' }))
+      await expect(useCase.execute({ email: 'naoexiste@teste.com', password: TEST_USER_PASSWORD }))
         .rejects.toThrow(AuthenticationError);
     });
 
@@ -85,21 +116,21 @@ describe('LoginUseCase', () => {
       const user = createUser();
       mockUserRepository.findByEmail.mockResolvedValue(user);
 
-      await expect(useCase.execute({ email: 'user@teste.com', password: 'senhaerrada' }))
+      await expect(useCase.execute({ email: 'user@teste.com', password: `${TEST_USER_PASSWORD}-errada` }))
         .rejects.toThrow(AuthenticationError);
     });
 
     it('deve autenticar com Application Password valida', async () => {
       const user = createUser();
       mockUserRepository.findByEmail.mockResolvedValue(user);
-      (mockUserRepository as any).findApplicationPassword.mockResolvedValue({
+      mockUserRepository.findApplicationPassword.mockResolvedValue({
         id: 'app-pwd-id',
-        passwordHash: bcrypt.hashSync('app-pwd-123', 10),
+        passwordHash: bcrypt.hashSync(TEST_APPLICATION_PASSWORD, 10),
       });
 
       const result = await useCase.execute({
         email: 'user@teste.com',
-        password: 'app-pwd-123',
+        password: TEST_APPLICATION_PASSWORD,
         appName: 'MyApp',
       });
 
@@ -112,11 +143,11 @@ describe('LoginUseCase', () => {
     it('deve lancar erro para Application Password com nome inexistente', async () => {
       const user = createUser();
       mockUserRepository.findByEmail.mockResolvedValue(user);
-      (mockUserRepository as any).findApplicationPassword.mockResolvedValue(null);
+      mockUserRepository.findApplicationPassword.mockResolvedValue(null);
 
       await expect(useCase.execute({
         email: 'user@teste.com',
-        password: 'app-pwd-123',
+        password: TEST_APPLICATION_PASSWORD,
         appName: 'AppInexistente',
       })).rejects.toThrow(AuthenticationError);
     });
@@ -124,14 +155,14 @@ describe('LoginUseCase', () => {
     it('deve lancar erro para Application Password com senha incorreta', async () => {
       const user = createUser();
       mockUserRepository.findByEmail.mockResolvedValue(user);
-      (mockUserRepository as any).findApplicationPassword.mockResolvedValue({
+      mockUserRepository.findApplicationPassword.mockResolvedValue({
         id: 'app-pwd-id',
-        passwordHash: bcrypt.hashSync('senha-correta', 10),
+        passwordHash: bcrypt.hashSync(TEST_APPLICATION_PASSWORD, 10),
       });
 
       await expect(useCase.execute({
         email: 'user@teste.com',
-        password: 'senha-errada',
+        password: `${TEST_APPLICATION_PASSWORD}-errada`,
         appName: 'MyApp',
       })).rejects.toThrow(AuthenticationError);
     });
@@ -139,18 +170,18 @@ describe('LoginUseCase', () => {
     it('deve atualizar lastUsedAt da Application Password', async () => {
       const user = createUser();
       mockUserRepository.findByEmail.mockResolvedValue(user);
-      (mockUserRepository as any).findApplicationPassword.mockResolvedValue({
+      mockUserRepository.findApplicationPassword.mockResolvedValue({
         id: 'app-pwd-id',
-        passwordHash: bcrypt.hashSync('app-pwd-123', 10),
+        passwordHash: bcrypt.hashSync(TEST_APPLICATION_PASSWORD, 10),
       });
 
       await useCase.execute({
         email: 'user@teste.com',
-        password: 'app-pwd-123',
+        password: TEST_APPLICATION_PASSWORD,
         appName: 'MyApp',
       });
 
-      expect((mockUserRepository as any).updateApplicationPasswordLastUsed)
+      expect(mockUserRepository.updateApplicationPasswordLastUsed)
         .toHaveBeenCalledWith('app-pwd-id');
     });
   });

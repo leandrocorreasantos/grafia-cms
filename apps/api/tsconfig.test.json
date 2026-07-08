@@ -1,19 +1,7 @@
 {
-    "extends": "../../tsconfig.base.json",
+    "extends": "./tsconfig.json",
     "compilerOptions": {
-        "target": "ES2020",
-        "module": "Node16",
-        "moduleResolution": "node16",
-        "outDir": "./dist",
         "rootDir": ".",
-        "paths": {
-            "@/*": ["./src/*"],
-            "@domain/*": ["./src/domain/*"],
-            "@application/*": ["./src/application/*"],
-            "@infrastructure/*": ["./src/infrastructure/*"]
-        },
-        "experimentalDecorators": true,
-        "emitDecoratorMetadata": true,
         "noEmit": true,
         "types": ["node", "jest"]
     },

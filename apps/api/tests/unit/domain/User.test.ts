@@ -1,3 +1,5 @@
+import { describe, it } from 'node:test';
+import {expect } from '@jest/globals'
 import { User, InvalidEmailError, InvalidNameError, WeakPasswordError, InvalidRoleError } from '../../../src/domain/user/User';
 import { UserRole } from '../../../src/domain/user/UserRole';
 import { v4 as uuidv4 } from 'uuid';
@@ -100,3 +102,4 @@ describe('User - Entidade de Dominio', () => {
     });
   });
 });
+
