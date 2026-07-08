@@ -2,12 +2,15 @@ import { CreatePostUseCase, CreatePostInput } from '../../../src/application/pos
 import { IPostRepository } from '../../../src/domain/post/IPostRepository';
 import { Post } from '../../../src/domain/post/Post';
 import { PostStatus } from '../../../src/domain/post/PostStatus';
+import { jest } from '@jest/globals';
+import { beforeEach, describe, expect, it } from '@jest/globals';
 
 const mockPostRepository: jest.Mocked<IPostRepository> = {
   save: jest.fn(),
   findById: jest.fn(),
   findBySlug: jest.fn(),
   findAll: jest.fn(),
+  findPublished: jest.fn(),
   findByAuthorId: jest.fn(),
   count: jest.fn(),
   delete: jest.fn(),

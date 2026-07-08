@@ -62,8 +62,27 @@ export class User {
     );
   }
 
+  private static isValidEmail(email: string): boolean {
+    const normalizedEmail = email.trim();
+    const atIndex = normalizedEmail.indexOf('@');
+
+    if (atIndex <= 0 || atIndex !== normalizedEmail.lastIndexOf('@')) {
+      return false;
+    }
+
+    const localPart = normalizedEmail.slice(0, atIndex);
+    const domainPart = normalizedEmail.slice(atIndex + 1);
+    const dotIndex = domainPart.lastIndexOf('.');
+
+    if (!localPart || !domainPart || dotIndex <= 0 || dotIndex === domainPart.length - 1) {
+      return false;
+    }
+
+    return !/\s/.test(normalizedEmail) && !domainPart.includes('..');
+  }
+
   private static validate(data: Partial<UserData>): void {
-    if (data.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+    if (data.email && !User.isValidEmail(data.email)) {
       throw new InvalidEmailError(data.email);
     }
     if (data.name && data.name.trim().length < 2) {

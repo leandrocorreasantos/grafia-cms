@@ -43,6 +43,37 @@ export function authenticate(jwtService: JwtService) {
 }
 
 /**
+ * Middleware que tenta autenticar sem bloquear acesso quando nao ha token.
+ * Se houver token, ele precisa ser valido.
+ */
+export function authenticateOptional(jwtService: JwtService) {
+  return (req: Request, _res: Response, next: NextFunction): void => {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader) {
+        next();
+        return;
+      }
+
+      const parts = authHeader.split(' ');
+      if (parts.length !== 2 || parts[0] !== 'Bearer') {
+        throw new AuthenticationError('Formato de token invalido. Use: Bearer <token>');
+      }
+
+      const payload = jwtService.verifyToken(parts[1]);
+      req.user = payload;
+      next();
+    } catch (error) {
+      if (error instanceof AuthenticationError) {
+        next(error);
+      } else {
+        next(new AuthenticationError('Token invalido ou expirado'));
+      }
+    }
+  };
+}
+
+/**
  * Middleware que exige um cargo minimo para acessar a rota.
  * Deve ser usado APOS o middleware `authenticate`.
  */

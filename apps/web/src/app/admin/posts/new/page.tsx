@@ -3,12 +3,25 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
+import { useEffect } from 'react';
 
 export default function NewPost() {
     const router = useRouter();
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        const verifySession = async () => {
+            try {
+                await api.get('/api/auth/me');
+            } catch {
+                router.push('/login?next=/admin/posts/new');
+            }
+        };
+
+        verifySession();
+    }, [router]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();

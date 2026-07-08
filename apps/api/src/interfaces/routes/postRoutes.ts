@@ -8,7 +8,11 @@ import { UpdatePostUseCase } from '../../application/post/UpdatePostUseCase';
 import { DeletePostUseCase } from '../../application/post/DeletePostUseCase';
 import { PostController } from '../http/PostController';
 import { JwtService } from '../../infrastructure/auth/JwtService';
-import { authenticate } from '../middlewares/authMiddleware';
+import { authenticate, authenticateOptional } from '../middlewares/authMiddleware';
+import {
+  publicPostRateLimit,
+  privatePostRateLimit,
+} from '../middlewares/rateLimitMiddleware';
 
 export function createPostRoutes(prisma: PrismaClient, jwtSecret: string): Router {
   const router = Router();
@@ -30,23 +34,33 @@ export function createPostRoutes(prisma: PrismaClient, jwtSecret: string): Route
   );
 
   // GET /api/posts - publico
-  router.get('/', (req, res, next) => postController.list(req, res, next));
+  router.get(
+    '/',
+    publicPostRateLimit,
+    authenticateOptional(jwtService),
+    (req, res, next) => postController.list(req, res, next),
+  );
 
   // GET /api/posts/:id - publico
-  router.get('/:id', (req, res, next) => postController.getById(req, res, next));
+  router.get(
+    '/:id',
+    publicPostRateLimit,
+    authenticateOptional(jwtService),
+    (req, res, next) => postController.getById(req, res, next),
+  );
 
   // POST /api/posts - autenticado (author+)
-  router.post('/', authenticate(jwtService), (req, res, next) =>
+  router.post('/', privatePostRateLimit, authenticate(jwtService), (req, res, next) =>
     postController.create(req, res, next),
   );
 
   // PUT /api/posts/:id - autenticado (author+)
-  router.put('/:id', authenticate(jwtService), (req, res, next) =>
+  router.put('/:id', privatePostRateLimit, authenticate(jwtService), (req, res, next) =>
     postController.update(req, res, next),
   );
 
   // DELETE /api/posts/:id - autenticado (editor+)
-  router.delete('/:id', authenticate(jwtService), (req, res, next) =>
+  router.delete('/:id', privatePostRateLimit, authenticate(jwtService), (req, res, next) =>
     postController.delete(req, res, next),
   );
 

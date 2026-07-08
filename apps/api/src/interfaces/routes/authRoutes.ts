@@ -6,6 +6,10 @@ import { JwtService } from '../../infrastructure/auth/JwtService';
 import { PrismaUserRepository } from '../../infrastructure/repositories/UserRepository';
 import { LoginUseCase } from '../../application/auth/LoginUseCase';
 import { authenticate, requireUserToken } from '../middlewares/authMiddleware';
+import {
+  publicAuthRateLimit,
+  privateAuthRateLimit,
+} from '../middlewares/rateLimitMiddleware';
 
 export function createAuthRoutes(prisma: PrismaClient, jwtSecret: string): Router {
   const router = Router();
@@ -16,10 +20,14 @@ export function createAuthRoutes(prisma: PrismaClient, jwtSecret: string): Route
   const appPasswordController = new AppPasswordController(prisma);
 
   // POST /api/auth/login - publico
-  router.post('/login', (req, res, next) => authController.login(req, res, next));
+  router.post(
+    '/login',
+    publicAuthRateLimit,
+    (req, res, next) => authController.login(req, res, next),
+  );
 
   // GET /api/auth/me - protegido
-  router.get('/me', authenticate(jwtService), (req, res) =>
+  router.get('/me', privateAuthRateLimit, authenticate(jwtService), (req, res) =>
     authController.me(req, res),
   );
 
@@ -28,6 +36,7 @@ export function createAuthRoutes(prisma: PrismaClient, jwtSecret: string): Route
   // GET /api/auth/app-passwords
   router.get(
     '/app-passwords',
+    privateAuthRateLimit,
     authenticate(jwtService),
     requireUserToken,
     (req, res, next) => appPasswordController.list(req, res, next),
@@ -36,6 +45,7 @@ export function createAuthRoutes(prisma: PrismaClient, jwtSecret: string): Route
   // POST /api/auth/app-passwords
   router.post(
     '/app-passwords',
+    privateAuthRateLimit,
     authenticate(jwtService),
     requireUserToken,
     (req, res, next) => appPasswordController.create(req, res, next),
@@ -44,6 +54,7 @@ export function createAuthRoutes(prisma: PrismaClient, jwtSecret: string): Route
   // DELETE /api/auth/app-passwords/:id
   router.delete(
     '/app-passwords/:id',
+    privateAuthRateLimit,
     authenticate(jwtService),
     requireUserToken,
     (req, res, next) => appPasswordController.revoke(req, res, next),

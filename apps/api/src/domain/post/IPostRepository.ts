@@ -5,6 +5,7 @@ export interface IPostRepository {
   findById(id: string): Promise<Post | null>;
   findBySlug(slug: string): Promise<Post | null>;
   findAll(limit?: number, offset?: number): Promise<Post[]>;
+  findPublished(limit?: number, offset?: number): Promise<Post[]>;
   findByAuthorId(authorId: string): Promise<Post[]>;
   count(): Promise<number>;
   delete(id: string): Promise<void>;

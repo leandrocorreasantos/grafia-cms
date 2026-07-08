@@ -6,6 +6,7 @@ import { UpdatePostUseCase } from '../../application/post/UpdatePostUseCase';
 import { DeletePostUseCase } from '../../application/post/DeletePostUseCase';
 import { AuthorizationError } from '../../domain/errors/DomainError';
 import { UserRole, hasMinRole } from '../../domain/user/UserRole';
+import { PostStatus } from '../../domain/post/PostStatus';
 
 export class PostController {
   constructor(
@@ -41,7 +42,10 @@ export class PostController {
 
   async list(_req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const posts = await this.getPostsUseCase.execute();
+      const canViewDrafts = !!_req.user && hasMinRole(_req.user.role, UserRole.AUTHOR);
+      const posts = await this.getPostsUseCase.execute({
+        onlyPublished: !canViewDrafts,
+      });
       res.json(posts.map((post) => post.toJSON()));
     } catch (error) {
       next(error);
@@ -51,10 +55,13 @@ export class PostController {
   async getById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const post = await this.getPostByIdUseCase.execute(req.params.id);
-      if (!post) {
+      const canViewUnpublished = !!req.user && hasMinRole(req.user.role, UserRole.AUTHOR);
+
+      if (post.status !== PostStatus.PUBLISHED && !canViewUnpublished) {
         res.status(404).json({ error: 'Post nao encontrado' });
         return;
       }
+
       res.json(post.toJSON());
     } catch (error) {
       next(error);

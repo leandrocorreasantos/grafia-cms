@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 
 interface Post {
@@ -12,16 +13,26 @@ interface Post {
 }
 
 export default function AdminDashboard() {
+    const router = useRouter();
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        loadPosts();
+        verifySessionAndLoad();
     }, []);
+
+    const verifySessionAndLoad = async () => {
+        try {
+            await api.get('/api/auth/me');
+            await loadPosts();
+        } catch {
+            router.push('/login?next=/admin');
+        }
+    };
 
     const loadPosts = async () => {
         try {
-            const data = await api.get('/api/posts');
+            const data = await api.get<Post[]>('/api/posts');
             setPosts(data);
         } catch (error) {
             console.error('Erro ao carregar posts:', error);

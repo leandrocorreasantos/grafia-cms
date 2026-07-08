@@ -2,11 +2,12 @@ import request from 'supertest';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
+import { beforeAll, afterAll, describe, it, expect } from '@jest/globals';
 import { createTestApp, JWT_SECRET, seedAdmin } from '../helpers/test-utils';
 
-// ============================================
+/* ============================================
 // SETUP
-// ============================================
+ ============================================ */
 
 let prisma: PrismaClient;
 let app: ReturnType<typeof createTestApp>;
@@ -344,6 +345,62 @@ describe('Controle de Acesso por Cargo - Posts', () => {
         .expect(200);
 
       expect(Array.isArray(res.body)).toBe(true);
+    });
+
+    it('deve retornar somente posts publicados para usuarios anonimos', async () => {
+      const draftRes = await request(app)
+        .post('/api/posts')
+        .set('Authorization', `Bearer ${authorToken}`)
+        .send({
+          title: 'Rascunho Privado',
+          content: 'Conteudo de rascunho que nao deve aparecer sem token',
+          status: 'draft',
+        })
+        .expect(201);
+
+      const publishedRes = await request(app)
+        .post('/api/posts')
+        .set('Authorization', `Bearer ${authorToken}`)
+        .send({
+          title: 'Post Publicado',
+          content: 'Conteudo publicado com mais de 10 caracteres',
+          status: 'published',
+        })
+        .expect(201);
+
+      const listRes = await request(app)
+        .get('/api/posts')
+        .expect(200);
+
+      const ids = listRes.body.map((post: any) => post.id);
+      expect(ids).toContain(publishedRes.body.id);
+      expect(ids).not.toContain(draftRes.body.id);
+    });
+  });
+
+  describe('GET /api/posts/:id (publico)', () => {
+    it('deve negar acesso anonimo a rascunho e permitir para usuario autenticado', async () => {
+      const createRes = await request(app)
+        .post('/api/posts')
+        .set('Authorization', `Bearer ${authorToken}`)
+        .send({
+          title: 'Rascunho Oculto',
+          content: 'Conteudo de rascunho para teste de acesso por id',
+          status: 'draft',
+        })
+        .expect(201);
+
+      await request(app)
+        .get(`/api/posts/${createRes.body.id}`)
+        .expect(404);
+
+      const authRes = await request(app)
+        .get(`/api/posts/${createRes.body.id}`)
+        .set('Authorization', `Bearer ${authorToken}`)
+        .expect(200);
+
+      expect(authRes.body.id).toBe(createRes.body.id);
+      expect(authRes.body.status).toBe('draft');
     });
   });
 

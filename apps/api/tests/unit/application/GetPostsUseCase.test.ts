@@ -3,12 +3,15 @@ import { IPostRepository } from '../../../src/domain/post/IPostRepository';
 import { Post } from '../../../src/domain/post/Post';
 import { PostStatus } from '../../../src/domain/post/PostStatus';
 import { v4 as uuidv4 } from 'uuid';
+import { jest } from '@jest/globals';
+import { beforeEach, describe, expect, it } from '@jest/globals';
 
 const mockPostRepository: jest.Mocked<IPostRepository> = {
   save: jest.fn(),
   findById: jest.fn(),
   findBySlug: jest.fn(),
   findAll: jest.fn(),
+  findPublished: jest.fn(),
   findByAuthorId: jest.fn(),
   count: jest.fn(),
   delete: jest.fn(),
@@ -56,5 +59,17 @@ describe('GetPostsUseCase', () => {
     const result = await useCase.execute();
 
     expect(result).toEqual([]);
+  });
+
+  it('deve retornar apenas publicados quando solicitado', async () => {
+    const publishedPosts = [createMockPost({ title: 'Publicado 1' })];
+    mockPostRepository.findPublished.mockResolvedValue(publishedPosts);
+
+    const result = await useCase.execute({ onlyPublished: true });
+
+    expect(result).toHaveLength(1);
+    expect(result[0].title).toBe('Publicado 1');
+    expect(mockPostRepository.findPublished).toHaveBeenCalled();
+    expect(mockPostRepository.findAll).not.toHaveBeenCalled();
   });
 });
