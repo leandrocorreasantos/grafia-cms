@@ -15,5 +15,9 @@ export const ROLE_HIERARCHY: Record<UserRole, number> = {
 export const ALL_ROLES = Object.values(UserRole);
 
 export function hasMinRole(role: UserRole, required: UserRole): boolean {
+  if (role === UserRole.ADMIN) {
+    return true;
+  }
+
   return ROLE_HIERARCHY[role] >= ROLE_HIERARCHY[required];
 }

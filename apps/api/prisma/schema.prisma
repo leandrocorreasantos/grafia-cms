@@ -8,24 +8,71 @@ datasource db {
 }
 
 model Post {
-  id          String   @id @default(cuid())
+  id          String   @id @default(uuid()) @db.Uuid
   title       String
   slug        String   @unique
   content     String   @db.Text
   excerpt     String   @db.Text
   status      String   @default("draft")
-  authorId    String
-  categoryIds String[]
-  tagIds      String[]
+  authorId    String   @db.Uuid
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   publishedAt DateTime?
 
-  author User @relation(fields: [authorId], references: [id])
+  author         User           @relation(fields: [authorId], references: [id])
+  postCategories PostCategory[]
+  postTags       PostTag[]
+}
+
+model Category {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String
+  slug        String   @unique
+  description String   @db.Text
+  parentId    String?  @db.Uuid
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  parent         Category?      @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children       Category[]     @relation("CategoryHierarchy")
+  postCategories PostCategory[]
+}
+
+model Tag {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String
+  slug        String   @unique
+  description String   @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  postTags PostTag[]
+}
+
+model PostCategory {
+  postId     String   @db.Uuid
+  categoryId String   @db.Uuid
+  createdAt  DateTime @default(now())
+
+  post     Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([postId, categoryId])
+}
+
+model PostTag {
+  postId    String   @db.Uuid
+  tagId     String   @db.Uuid
+  createdAt DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([postId, tagId])
 }
 
 model User {
-  id           String   @id @default(cuid())
+  id           String   @id @default(uuid()) @db.Uuid
   email        String   @unique
   name         String
   passwordHash String
@@ -38,8 +85,8 @@ model User {
 }
 
 model ApplicationPassword {
-  id           String    @id @default(cuid())
-  userId       String
+  id           String    @id @default(uuid()) @db.Uuid
+  userId       String    @db.Uuid
   name         String
   passwordHash String
   lastUsedAt   DateTime?

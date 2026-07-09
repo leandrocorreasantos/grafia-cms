@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard Example</title>
+    <link rel="stylesheet" href="./admin-dashboard.css" />
+  </head>
+  <body>
+    <div class="admin-dashboard sidebar-open">
+      <!-- Sidebar -->
+      <aside class="admin-sidebar" aria-label="Menu principal">
+        <div class="admin-sidebar__brand">Grafia Admin</div>
+
+        <ul class="admin-sidebar__menu">
+          <li class="admin-sidebar__item">
+            <a href="#" class="admin-sidebar__link is-active" aria-current="page">
+              <span class="admin-sidebar__icon">&#x1F4CA;</span>
+              <span class="admin-sidebar__text">Dashboard</span>
+            </a>
+          </li>
+
+          <li class="admin-sidebar__item is-open">
+            <a href="#" class="admin-sidebar__link" aria-expanded="true">
+              <span class="admin-sidebar__icon">&#x270D;</span>
+              <span class="admin-sidebar__text">Posts</span>
+              <span class="admin-sidebar__caret">&#x25BE;</span>
+            </a>
+            <ul class="admin-submenu">
+              <li><a class="admin-submenu__link is-active" href="#">Todos os posts</a></li>
+              <li><a class="admin-submenu__link" href="#">Adicionar novo</a></li>
+              <li><a class="admin-submenu__link" href="#">Categorias</a></li>
+              <li><a class="admin-submenu__link" href="#">Tags</a></li>
+            </ul>
+          </li>
+
+          <li class="admin-sidebar__item">
+            <a href="#" class="admin-sidebar__link">
+              <span class="admin-sidebar__icon">&#x1F464;</span>
+              <span class="admin-sidebar__text">Usuarios</span>
+            </a>
+          </li>
+
+          <li class="admin-sidebar__item">
+            <a href="#" class="admin-sidebar__link">
+              <span class="admin-sidebar__icon">&#x2699;</span>
+              <span class="admin-sidebar__text">Configuracoes</span>
+            </a>
+          </li>
+        </ul>
+      </aside>
+
+      <!-- Main -->
+      <main class="admin-main">
+        <!-- Topbar -->
+        <header class="admin-topbar" aria-label="Barra superior administrativa">
+          <div class="admin-topbar__left">
+            <button class="admin-toggle" type="button" aria-label="Abrir menu">&#x2630;</button>
+            <h1 class="admin-topbar__title">Painel administrativo</h1>
+          </div>
+
+          <div class="admin-topbar__right">
+            <button class="admin-icon-btn" type="button" aria-label="Notificacoes">
+              &#x1F514;
+              <span class="admin-badge">3</span>
+            </button>
+            <button class="admin-icon-btn" type="button" aria-label="Configuracoes rapidas">&#x2699;</button>
+
+            <div class="admin-user-menu is-open">
+              <button class="admin-user-trigger" type="button" aria-haspopup="menu" aria-expanded="true">
+                <span class="admin-user-avatar">AD</span>
+                <span>Admin</span>
+              </button>
+              <div class="admin-user-dropdown" role="menu" aria-label="Menu do usuario">
+                <a href="#" role="menuitem">Perfil</a>
+                <a href="#" role="menuitem">Minha conta</a>
+                <a href="#" role="menuitem">Sair</a>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- Content -->
+        <section class="admin-content fade-in">
+          <h1>Dashboard</h1>
+          <p class="subtitle">Visao geral do sistema</p>
+
+          <div class="admin-grid">
+            <article class="admin-card">
+              <p class="admin-card__label">Total de posts</p>
+              <p class="admin-card__value">128</p>
+              <p class="admin-card__meta">+8 esta semana</p>
+            </article>
+            <article class="admin-card">
+              <p class="admin-card__label">Usuarios</p>
+              <p class="admin-card__value">57</p>
+              <p class="admin-card__meta">+2 hoje</p>
+            </article>
+            <article class="admin-card">
+              <p class="admin-card__label">Comentarios</p>
+              <p class="admin-card__value">341</p>
+              <p class="admin-card__meta">15 pendentes</p>
+            </article>
+            <article class="admin-card">
+              <p class="admin-card__label">Midias</p>
+              <p class="admin-card__value">612</p>
+              <p class="admin-card__meta">Biblioteca ativa</p>
+            </article>
+          </div>
+
+          <div class="admin-table-wrap">
+            <table class="admin-table" aria-label="Lista de posts recentes">
+              <thead>
+                <tr>
+                  <th>Titulo</th>
+                  <th>Autor</th>
+                  <th>Status</th>
+                  <th>Data</th>
+                  <th>Acoes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Guia de SEO para blog</td>
+                  <td class="muted">Ana</td>
+                  <td>Publicado</td>
+                  <td class="muted">08/07/2026</td>
+                  <td>
+                    <button class="btn btn-secondary btn-sm" type="button">Editar</button>
+                    <button class="btn btn-danger btn-sm" type="button">Excluir</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Como organizar categorias</td>
+                  <td class="muted">Bruno</td>
+                  <td>Rascunho</td>
+                  <td class="muted">07/07/2026</td>
+                  <td>
+                    <button class="btn btn-secondary btn-sm" type="button">Editar</button>
+                    <button class="btn btn-danger btn-sm" type="button">Excluir</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <nav class="admin-pagination" aria-label="Paginacao da tabela">
+              <button class="admin-pagination__item" type="button" aria-label="Pagina anterior">&lt;</button>
+              <button class="admin-pagination__item is-active" type="button" aria-current="page">1</button>
+              <button class="admin-pagination__item" type="button">2</button>
+              <button class="admin-pagination__item" type="button">3</button>
+              <button class="admin-pagination__item" type="button" aria-label="Proxima pagina">&gt;</button>
+            </nav>
+          </div>
+
+          <div class="admin-card" style="margin-top: 20px">
+            <h2 class="text-subtitle" style="margin-bottom: 12px">Novo post</h2>
+            <form>
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="title">Titulo</label>
+                  <input id="title" class="form-control" type="text" placeholder="Digite o titulo" />
+                </div>
+                <div class="form-group">
+                  <label for="slug">Slug</label>
+                  <input id="slug" class="form-control" type="text" placeholder="slug-do-post" />
+                </div>
+                <div class="form-group" style="grid-column: 1 / -1">
+                  <label for="content">Conteudo</label>
+                  <textarea id="content" class="form-control" rows="5" placeholder="Escreva aqui..."></textarea>
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 8px; margin-top: 14px">
+                <button class="btn btn-primary btn-lg" type="submit">Publicar</button>
+                <button class="btn btn-secondary" type="button">Salvar rascunho</button>
+              </div>
+            </form>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

@@ -273,7 +273,7 @@ async function runMigrations() {
   info('Executando migrações do banco de dados...');
 
   try {
-    execSync('npx prisma generate', {
+    execSync('npm run db:generate --workspace=apps/api', {
       cwd: rootDir,
       stdio: 'ignore'
     });
@@ -284,7 +284,7 @@ async function runMigrations() {
   }
 
   try {
-    execSync('npx prisma migrate deploy', {
+    execSync('npm run db:deploy --workspace=apps/api', {
       cwd: rootDir,
       stdio: 'ignore'
     });
@@ -292,7 +292,7 @@ async function runMigrations() {
   } catch (err) {
     // Se não houver migrations ainda, tentar criar
     try {
-      execSync('npx prisma migrate dev --name init --skip-generate', {
+      execSync('npm run db:migrate --workspace=apps/api -- --name init --skip-generate', {
         cwd: rootDir,
         stdio: 'ignore'
       });

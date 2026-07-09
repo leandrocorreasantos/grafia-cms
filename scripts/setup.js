@@ -25,8 +25,8 @@ console.log(colors.bold(colors.cyan('\n🚀 Grafia CMS - Setup Rápido\n')));
 async function setup() {
   const steps = [
     { name: 'Instalando dependências...', cmd: 'npm install --production' },
-    { name: 'Gerando Prisma Client...', cmd: 'npx prisma generate' },
-    { name: 'Executando migrações...', cmd: 'npx prisma migrate deploy' },
+    { name: 'Gerando Prisma Client...', cmd: 'npm run db:generate --workspace=apps/api' },
+    { name: 'Executando migrações...', cmd: 'npm run db:deploy --workspace=apps/api' },
     { name: 'Criando usuário admin...', cmd: 'node scripts/create-admin.js' },
     { name: 'Criando diretórios de dados...', cmd: null }
   ];

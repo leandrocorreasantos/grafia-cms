@@ -47,8 +47,6 @@ e muito mais.
             excerpt: 'Bem-vindo ao Grafia CMS - O sistema de gerenciamento de conteúdo que une elegância e potência.',
             status: 'published',
             authorId: admin.id,
-            categoryIds: [],
-            tagIds: [],
             publishedAt: new Date()
         }
     });

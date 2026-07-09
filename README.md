@@ -15,7 +15,7 @@ grafia-cms/
 │   └── web/              # Frontend (Next.js + React + Tailwind CSS)
 ├── packages/
 │   └── shared/           # Tipos e utilitários compartilhados
-├── prisma/               # Schema + migrações do banco de dados
+├── apps/api/prisma/      # Schema + migrações do banco de dados
 ├── scripts/              # CLI + instaladores
 ├── server.js             # Servidor principal (produção)
 ├── ecosystem.config.js   # PM2 para produção
@@ -105,6 +105,9 @@ npm start
 # 1. Instale as dependências
 npm install
 
+# 1.1 Configure variáveis da API
+cp apps/api/.env.example apps/api/.env
+
 # 2. Suba o banco de dados PostgreSQL via Docker
 docker compose up -d
 
@@ -125,6 +128,12 @@ npm run dev
 ```
 
 > Para rodar apenas a API (sem o frontend), use `npm run dev:api`.
+
+### Padrao de variaveis de ambiente
+
+- API e Prisma: usar somente apps/api/.env
+- Servidor raiz (server.js): usar .env na raiz
+- Evite duplicar DATABASE_URL, JWT_SECRET, PORT e NODE_ENV em ambos os arquivos para nao causar conflito no Prisma Studio.
 
 ### Acessos
 
@@ -153,7 +162,7 @@ npm run dev
 
 | Comando | Descrição |
 |---------|-----------|
-| `npm run db:generate` | Gera o Prisma Client (a partir de `prisma/schema.prisma`) |
+| `npm run db:generate` | Gera o Prisma Client (a partir de `apps/api/prisma/schema.prisma`) |
 | `npm run db:migrate` | Cria migrações de desenvolvimento |
 | `npm run db:deploy` | Aplica migrações em produção |
 | `npm run db:studio` | Abre o Prisma Studio (GUI do banco) |
@@ -199,27 +208,27 @@ npm run dev
 
 ## 🗄️ Modelo de Dados
 
-O schema do banco está centralizado em `prisma/schema.prisma`:
+O schema do banco está centralizado em `apps/api/prisma/schema.prisma`:
 
 ```prisma
 model Post {
-  id          String   @id @default(cuid())
+   id          String   @id @default(uuid()) @db.Uuid
   title       String
   slug        String   @unique
   content     String   @db.Text
   excerpt     String   @db.Text
   status      String   @default("draft")   // draft | published | archived
-  authorId    String
-  categoryIds String[]
-  tagIds      String[]
+   authorId    String   @db.Uuid
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   publishedAt DateTime?
-  author      User     @relation(fields: [authorId], references: [id])
+   author      User           @relation(fields: [authorId], references: [id])
+   postCategories PostCategory[]
+   postTags       PostTag[]
 }
 
 model User {
-  id           String   @id @default(cuid())
+   id           String   @id @default(uuid()) @db.Uuid
   email        String   @unique
   name         String
   passwordHash String

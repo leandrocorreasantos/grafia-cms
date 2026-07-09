@@ -4,10 +4,100 @@
 
 :root {
     --foreground-rgb: 26, 26, 26;
-    --background-rgb: 249, 250, 251;
+    --background-rgb: 244, 241, 234;
+    --surface-rgb: 248, 245, 239;
+    --surface-strong-rgb: 255, 255, 255;
+    --border-rgb: 224, 214, 195;
+    --accent-rgb: 201, 168, 76;
+}
+
+html {
+    scroll-behavior: smooth;
 }
 
 body {
+    min-height: 100vh;
+    margin: 0;
     color: rgb(var(--foreground-rgb));
-    background: rgb(var(--background-rgb));
+    background:
+        radial-gradient(circle at top left, rgba(var(--accent-rgb), 0.12), transparent 34%),
+        radial-gradient(circle at top right, rgba(255, 255, 255, 0.75), transparent 28%),
+        linear-gradient(180deg, rgb(var(--surface-rgb)) 0%, rgb(var(--background-rgb)) 100%);
+    background-attachment: fixed;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+main {
+    position: relative;
+}
+
+a {
+    text-decoration-skip-ink: auto;
+}
+
+button,
+a,
+input,
+textarea,
+select {
+    -webkit-tap-highlight-color: transparent;
+}
+
+::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(var(--surface-rgb), 0.8);
+}
+
+::-webkit-scrollbar-thumb {
+    border: 3px solid rgba(var(--surface-rgb), 0.8);
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.18);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.28);
+}
+
+::selection {
+    background: rgba(var(--accent-rgb), 0.28);
+    color: rgb(var(--foreground-rgb));
+}
+
+table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+img,
+svg,
+video,
+canvas {
+    display: block;
+    max-width: 100%;
+}
+
+code,
+kbd,
+pre {
+    font-family: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }

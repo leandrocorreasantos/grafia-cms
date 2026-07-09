@@ -1,14 +1,14 @@
 -- CreateTable
 CREATE TABLE "Post" (
-    "id" TEXT NOT NULL,
+    "id" UUID NOT NULL,
     "title" TEXT NOT NULL,
     "slug" TEXT NOT NULL,
     "content" TEXT NOT NULL,
     "excerpt" TEXT NOT NULL,
     "status" TEXT NOT NULL DEFAULT 'draft',
-    "authorId" TEXT NOT NULL,
-    "categoryIds" TEXT[],
-    "tagIds" TEXT[],
+    "authorId" UUID NOT NULL,
+    "categoryIds" UUID[],
+    "tagIds" UUID[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "publishedAt" TIMESTAMP(3),
@@ -18,7 +18,7 @@ CREATE TABLE "Post" (
 
 -- CreateTable
 CREATE TABLE "User" (
-    "id" TEXT NOT NULL,
+    "id" UUID NOT NULL,
     "email" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "passwordHash" TEXT NOT NULL,

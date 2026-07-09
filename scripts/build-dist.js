@@ -59,7 +59,7 @@ async function build() {
   // 4. Gerar Prisma Client
   process.stdout.write('  Gerando Prisma Client... ');
   try {
-    execSync('npx prisma generate', { cwd: rootDir, stdio: 'ignore' });
+    execSync('npm run db:generate --workspace=apps/api', { cwd: rootDir, stdio: 'ignore' });
     console.log(colors.green('✅'));
   } catch (err) {
     console.log(colors.red('❌'));

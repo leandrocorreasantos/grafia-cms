@@ -1,7 +1,7 @@
 -- CreateTable
 CREATE TABLE "ApplicationPassword" (
-    "id" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
+    "id" UUID NOT NULL,
+    "userId" UUID NOT NULL,
     "name" TEXT NOT NULL,
     "passwordHash" TEXT NOT NULL,
     "lastUsedAt" TIMESTAMP(3),

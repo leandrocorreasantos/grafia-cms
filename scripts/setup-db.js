@@ -30,7 +30,7 @@ async function setupDatabase() {
   // 1. Gerar Prisma Client
   process.stdout.write('  Gerando Prisma Client... ');
   try {
-    execSync('npx prisma generate', { cwd: rootDir, stdio: 'ignore' });
+    execSync('npm run db:generate --workspace=apps/api', { cwd: rootDir, stdio: 'ignore' });
     console.log(colors.green('✅'));
   } catch (err) {
     console.log(colors.red('❌'));
@@ -56,12 +56,12 @@ async function setupDatabase() {
   // 3. Executar migrações
   process.stdout.write('  Executando migrações... ');
   try {
-    execSync('npx prisma migrate deploy', { cwd: rootDir, stdio: 'ignore' });
+    execSync('npm run db:deploy --workspace=apps/api', { cwd: rootDir, stdio: 'ignore' });
     console.log(colors.green('✅'));
   } catch (err) {
     // Se não houver migrations, criar a inicial
     try {
-      execSync('npx prisma migrate dev --name init --skip-generate', {
+      execSync('npm run db:migrate --workspace=apps/api -- --name init --skip-generate', {
         cwd: rootDir,
         stdio: 'ignore'
       });
