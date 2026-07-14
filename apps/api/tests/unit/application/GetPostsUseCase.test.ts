@@ -15,6 +15,11 @@ const mockPostRepository: jest.Mocked<IPostRepository> = {
   findByAuthorId: jest.fn(),
   count: jest.fn(),
   delete: jest.fn(),
+  hardDelete: jest.fn(),
+  saveRevision: jest.fn(),
+  findRevisions: jest.fn(),
+  replacePostMediaRelations: jest.fn(),
+  slugExists: jest.fn(),
 };
 
 function createMockPost(overrides: Partial<{ id: string; title: string; content: string }> = {}) {
@@ -31,6 +36,11 @@ function createMockPost(overrides: Partial<{ id: string; title: string; content:
     createdAt: new Date(),
     updatedAt: new Date(),
     publishedAt: undefined,
+    type: 'post',
+    mediaIds: [],
+    wordCount: 0,
+    imageCount: 0,
+    linkCount: 0,
   });
 }
 

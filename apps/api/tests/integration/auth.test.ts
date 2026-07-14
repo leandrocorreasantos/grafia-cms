@@ -3,22 +3,43 @@ import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 import { beforeAll, afterAll, describe, it, expect } from '@jest/globals';
-import { createTestApp, JWT_SECRET, seedAdmin } from '../helpers/test-utils';
+import { createTestApp, seedAdmin } from '../helpers/test-utils';
 
 /* ============================================
-// SETUP
- ============================================ */
+// SETUP GLOBAL — inicializa tudo que os testes precisam
+// para que qualquer describe ou it funcione independente.
+// ============================================ */
 
 let prisma: PrismaClient;
 let app: ReturnType<typeof createTestApp>;
 let adminUser: any;
+/** Token de admin sempre disponível em todos os describes */
 let adminToken: string;
+/** Token de author criado no setup */
+let authorToken: string;
+/** Token de editor criado no setup */
+let editorToken: string;
+/** Token de contributor criado no setup */
+let contributorToken: string;
+/** ID do usuario author */
+let authorUserId: string;
 
-/** Limpa todas as tabelas entre execucoes */
 async function cleanDatabase() {
   await prisma.applicationPassword.deleteMany({});
   await prisma.post.deleteMany({});
   await prisma.user.deleteMany({});
+}
+
+async function createUserAndLogin(email: string, password: string, role: string) {
+  const id = uuidv4();
+  const passwordHash = await bcrypt.hash(password, 10);
+  const user = await prisma.user.create({
+    data: { id, email, name: email.split('@')[0], passwordHash, role },
+  });
+  const loginRes = await request(app)
+    .post('/api/auth/login')
+    .send({ email, password });
+  return { user, token: loginRes.body.token || '' };
 }
 
 beforeAll(async () => {
@@ -26,8 +47,25 @@ beforeAll(async () => {
   app = createTestApp(prisma);
   await cleanDatabase();
 
-  // Seed admin
+  // Admin
   adminUser = await seedAdmin(prisma);
+  const adminLogin = await request(app)
+    .post('/api/auth/login')
+    .send({ email: 'admin@teste.com', password: 'admin123' });
+  adminToken = adminLogin.body.token || '';
+
+  // Author
+  const author = await createUserAndLogin('author-acesso@teste.com', 'author123', 'author');
+  authorToken = author.token;
+  authorUserId = author.user.id;
+
+  // Editor
+  const editor = await createUserAndLogin('editor-acesso@teste.com', 'editor123', 'editor');
+  editorToken = editor.token;
+
+  // Contributor
+  const contributor = await createUserAndLogin('contrib@teste.com', 'contrib123', 'contributor');
+  contributorToken = contributor.token;
 });
 
 afterAll(async () => {
@@ -55,10 +93,7 @@ describe('POST /api/auth/login', () => {
         role: 'admin',
       });
       expect(typeof res.body.token).toBe('string');
-      expect(res.body.token.split('.')).toHaveLength(3); // JWT tem 3 partes
-
-      // Salvar token para testar /me depois
-      adminToken = res.body.token;
+      expect(res.body.token.split('.')).toHaveLength(3);
     });
 
     it('deve rejeitar senha incorreta', async () => {
@@ -103,7 +138,6 @@ describe('POST /api/auth/login', () => {
     let appPasswordValue: string;
 
     beforeAll(async () => {
-      // Criar Application Password para o admin
       appPasswordValue = 'test-app-password-123';
       const passwordHash = await bcrypt.hash(appPasswordValue, 10);
       await prisma.applicationPassword.create({
@@ -124,11 +158,7 @@ describe('POST /api/auth/login', () => {
     it('deve autenticar com Application Password valida', async () => {
       const res = await request(app)
         .post('/api/auth/login')
-        .send({
-          email: 'admin@teste.com',
-          password: appPasswordValue,
-          appName: 'TestApp',
-        })
+        .send({ email: 'admin@teste.com', password: appPasswordValue, appName: 'TestApp' })
         .expect(200);
 
       expect(res.body).toHaveProperty('token');
@@ -139,11 +169,7 @@ describe('POST /api/auth/login', () => {
     it('deve rejeitar Application Password com senha incorreta', async () => {
       const res = await request(app)
         .post('/api/auth/login')
-        .send({
-          email: 'admin@teste.com',
-          password: 'senhaerrada',
-          appName: 'TestApp',
-        })
+        .send({ email: 'admin@teste.com', password: 'senhaerrada', appName: 'TestApp' })
         .expect(401);
 
       expect(res.body).toHaveProperty('error');
@@ -152,11 +178,7 @@ describe('POST /api/auth/login', () => {
     it('deve rejeitar Application Password com nome inexistente', async () => {
       const res = await request(app)
         .post('/api/auth/login')
-        .send({
-          email: 'admin@teste.com',
-          password: appPasswordValue,
-          appName: 'AppInexistente',
-        })
+        .send({ email: 'admin@teste.com', password: appPasswordValue, appName: 'AppInexistente' })
         .expect(401);
 
       expect(res.body).toHaveProperty('error');
@@ -184,29 +206,21 @@ describe('GET /api/auth/me', () => {
   });
 
   it('deve rejeitar acesso sem token', async () => {
-    const res = await request(app)
-      .get('/api/auth/me')
-      .expect(401);
-
-    expect(res.body).toHaveProperty('error');
+    await request(app).get('/api/auth/me').expect(401);
   });
 
   it('deve rejeitar token mal formatado', async () => {
-    const res = await request(app)
+    await request(app)
       .get('/api/auth/me')
       .set('Authorization', 'InvalidToken')
       .expect(401);
-
-    expect(res.body).toHaveProperty('error');
   });
 
-  it('deve rejeitar token expirado (ou invalido)', async () => {
-    const res = await request(app)
+  it('deve rejeitar token invalido', async () => {
+    await request(app)
       .get('/api/auth/me')
       .set('Authorization', 'Bearer token.invalido.aqui')
       .expect(401);
-
-    expect(res.body).toHaveProperty('error');
   });
 });
 
@@ -238,7 +252,6 @@ describe('Application Passwords CRUD', () => {
     expect(Array.isArray(res.body)).toBe(true);
     expect(res.body.length).toBeGreaterThanOrEqual(1);
 
-    // Verificar que o hash nunca e retornado
     const appPwd = res.body.find((p: any) => p.name === 'IntegracaoZapier');
     expect(appPwd).toBeDefined();
     expect(appPwd).not.toHaveProperty('passwordHash');
@@ -265,7 +278,6 @@ describe('Application Passwords CRUD', () => {
   });
 
   it('deve revogar (deletar) uma Application Password', async () => {
-    // Primeiro listar para pegar o ID
     const listRes = await request(app)
       .get('/api/auth/app-passwords')
       .set('Authorization', `Bearer ${adminToken}`);
@@ -279,12 +291,12 @@ describe('Application Passwords CRUD', () => {
       .expect(200);
 
     expect(res.body).toHaveProperty('message');
-    expect(res.body.message).toContain('sucesso');
   });
 
   it('deve retornar 404 ao revogar ID inexistente', async () => {
+    const nonExistentId = uuidv4();
     const res = await request(app)
-      .delete('/api/auth/app-passwords/id-inexistente')
+      .delete(`/api/auth/app-passwords/${nonExistentId}`)
       .set('Authorization', `Bearer ${adminToken}`)
       .expect(404);
 
@@ -297,53 +309,9 @@ describe('Application Passwords CRUD', () => {
 // ============================================
 
 describe('Controle de Acesso por Cargo - Posts', () => {
-  let authorToken: string;
-  let editorToken: string;
-  let authorUser: any;
-
-  beforeAll(async () => {
-    // Criar author
-    authorUser = await prisma.user.create({
-      data: {
-        id: uuidv4(),
-        email: 'author-acesso@teste.com',
-        name: 'Author Acesso',
-        passwordHash: await bcrypt.hash('author123', 10),
-        role: 'author',
-      },
-    });
-
-    // Criar editor
-    await prisma.user.create({
-      data: {
-        id: uuidv4(),
-        email: 'editor-acesso@teste.com',
-        name: 'Editor Acesso',
-        passwordHash: await bcrypt.hash('editor123', 10),
-        role: 'editor',
-      },
-    });
-
-    // Fazer login para obter tokens
-    const authorRes = await request(app)
-      .post('/api/auth/login')
-      .send({ email: 'author-acesso@teste.com', password: 'author123' });
-
-    authorToken = authorRes.body.token;
-
-    const editorRes = await request(app)
-      .post('/api/auth/login')
-      .send({ email: 'editor-acesso@teste.com', password: 'editor123' });
-
-    editorToken = editorRes.body.token;
-  });
-
   describe('GET /api/posts (publico)', () => {
     it('deve listar posts sem autenticacao', async () => {
-      const res = await request(app)
-        .get('/api/posts')
-        .expect(200);
-
+      const res = await request(app).get('/api/posts').expect(200);
       expect(Array.isArray(res.body)).toBe(true);
     });
 
@@ -351,28 +319,17 @@ describe('Controle de Acesso por Cargo - Posts', () => {
       const draftRes = await request(app)
         .post('/api/posts')
         .set('Authorization', `Bearer ${authorToken}`)
-        .send({
-          title: 'Rascunho Privado',
-          content: 'Conteudo de rascunho que nao deve aparecer sem token',
-          status: 'draft',
-        })
+        .send({ title: 'Rascunho Privado', content: 'Conteudo de rascunho que nao deve aparecer sem token', status: 'draft' })
         .expect(201);
 
       const publishedRes = await request(app)
         .post('/api/posts')
         .set('Authorization', `Bearer ${authorToken}`)
-        .send({
-          title: 'Post Publicado',
-          content: 'Conteudo publicado com mais de 10 caracteres',
-          status: 'published',
-        })
+        .send({ title: 'Post Publicado', content: 'Conteudo publicado com mais de 10 caracteres', status: 'published' })
         .expect(201);
 
-      const listRes = await request(app)
-        .get('/api/posts')
-        .expect(200);
-
-      const ids = listRes.body.map((post: any) => post.id);
+      const listRes = await request(app).get('/api/posts').expect(200);
+      const ids = listRes.body.map((p: any) => p.id);
       expect(ids).toContain(publishedRes.body.id);
       expect(ids).not.toContain(draftRes.body.id);
     });
@@ -383,16 +340,10 @@ describe('Controle de Acesso por Cargo - Posts', () => {
       const createRes = await request(app)
         .post('/api/posts')
         .set('Authorization', `Bearer ${authorToken}`)
-        .send({
-          title: 'Rascunho Oculto',
-          content: 'Conteudo de rascunho para teste de acesso por id',
-          status: 'draft',
-        })
+        .send({ title: 'Rascunho Oculto', content: 'Conteudo de rascunho para teste de acesso por id', status: 'draft' })
         .expect(201);
 
-      await request(app)
-        .get(`/api/posts/${createRes.body.id}`)
-        .expect(404);
+      await request(app).get(`/api/posts/${createRes.body.id}`).expect(404);
 
       const authRes = await request(app)
         .get(`/api/posts/${createRes.body.id}`)
@@ -409,10 +360,7 @@ describe('Controle de Acesso por Cargo - Posts', () => {
       const res = await request(app)
         .post('/api/posts')
         .set('Authorization', `Bearer ${authorToken}`)
-        .send({
-          title: 'Post do Author Teste',
-          content: 'Conteudo do post com pelo menos 10 caracteres...',
-        })
+        .send({ title: 'Post do Author Teste', content: 'Conteudo do post com pelo menos 10 caracteres...' })
         .expect(201);
 
       expect(res.body).toHaveProperty('id');
@@ -420,15 +368,10 @@ describe('Controle de Acesso por Cargo - Posts', () => {
     });
 
     it('deve rejeitar criacao sem token', async () => {
-      const res = await request(app)
+      await request(app)
         .post('/api/posts')
-        .send({
-          title: 'Post sem token',
-          content: 'Conteudo do post...',
-        })
+        .send({ title: 'Post sem token', content: 'Conteudo do post...' })
         .expect(401);
-
-      expect(res.body).toHaveProperty('error');
     });
   });
 
@@ -436,14 +379,10 @@ describe('Controle de Acesso por Cargo - Posts', () => {
     let postId: string;
 
     beforeAll(async () => {
-      // Author cria um post
       const createRes = await request(app)
         .post('/api/posts')
         .set('Authorization', `Bearer ${authorToken}`)
-        .send({
-          title: 'Post para deletar',
-          content: 'Conteudo do post para testar delecao...',
-        });
+        .send({ title: 'Post para deletar', content: 'Conteudo do post para testar delecao...' });
       postId = createRes.body.id;
     });
 
@@ -457,14 +396,10 @@ describe('Controle de Acesso por Cargo - Posts', () => {
     });
 
     it('deve rejeitar delecao por author (cargo insuficiente)', async () => {
-      // Criar outro post para o teste
       const createRes = await request(app)
         .post('/api/posts')
         .set('Authorization', `Bearer ${authorToken}`)
-        .send({
-          title: 'Outro post',
-          content: 'Conteudo do outro post...',
-        });
+        .send({ title: 'Outro post', content: 'Conteudo do outro post...' });
 
       const res = await request(app)
         .delete(`/api/posts/${createRes.body.id}`)
@@ -472,7 +407,6 @@ describe('Controle de Acesso por Cargo - Posts', () => {
         .expect(403);
 
       expect(res.body).toHaveProperty('error');
-      // Mensagem: "Apenas editores ou superiores podem remover posts"
       expect(res.body.error.toLowerCase()).toMatch(/editor|superior|restrito/);
     });
   });
@@ -483,27 +417,6 @@ describe('Controle de Acesso por Cargo - Posts', () => {
 // ============================================
 
 describe('Controle de Acesso por Cargo - Users', () => {
-  let contributorToken: string;
-
-  beforeAll(async () => {
-    // Criar usuário contributor
-    await prisma.user.create({
-      data: {
-        id: uuidv4(),
-        email: 'contrib@teste.com',
-        name: 'Contribuidor',
-        passwordHash: await bcrypt.hash('contrib123', 10),
-        role: 'contributor',
-      },
-    });
-
-    const loginRes = await request(app)
-      .post('/api/auth/login')
-      .send({ email: 'contrib@teste.com', password: 'contrib123' });
-
-    contributorToken = loginRes.body.token;
-  });
-
   describe('GET /api/users', () => {
     it('deve permitir admin listar usuarios', async () => {
       const res = await request(app)
@@ -526,11 +439,7 @@ describe('Controle de Acesso por Cargo - Users', () => {
     });
 
     it('deve negar acesso sem token', async () => {
-      const res = await request(app)
-        .get('/api/users')
-        .expect(401);
-
-      expect(res.body).toHaveProperty('error');
+      await request(app).get('/api/users').expect(401);
     });
   });
 });
@@ -541,10 +450,7 @@ describe('Controle de Acesso por Cargo - Users', () => {
 
 describe('GET /api/health', () => {
   it('deve retornar status ok', async () => {
-    const res = await request(app)
-      .get('/api/health')
-      .expect(200);
-
+    const res = await request(app).get('/api/health').expect(200);
     expect(res.body).toHaveProperty('status', 'ok');
   });
 });

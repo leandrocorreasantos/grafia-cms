@@ -2,19 +2,23 @@ import express from 'express';
 import cors from 'cors';
 import { PrismaClient } from '@prisma/client';
 import { config } from 'dotenv';
+import path from 'path';
 
 // Middlewares
 import { errorHandler } from './interfaces/middlewares/errorHandler';
 
 // Rotas
 import { createAuthRoutes } from './interfaces/routes/authRoutes';
+import { createMediaRoutes } from './interfaces/routes/mediaRoutes';
 import { createPostRoutes } from './interfaces/routes/postRoutes';
 import { createUserRoutes } from './interfaces/routes/userRoutes';
+import { createCategoryRoutes } from './interfaces/routes/categoryRoutes';
 
 config();
 
 const app = express();
 const prisma = new PrismaClient();
+const uploadRoot = path.resolve(process.cwd(), process.env.UPLOAD_PATH || '../../public/uploads');
 
 // JWT Secret - usa variável de ambiente ou fallback para desenvolvimento
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-nao-use-em-producao';
@@ -22,6 +26,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-nao-use-em-producao';
 // Middlewares globais
 app.use(cors());
 app.use(express.json());
+app.use('/uploads', express.static(uploadRoot));
 
 // ============================================
 // ROTAS
@@ -43,8 +48,14 @@ app.use('/api/auth', createAuthRoutes(prisma, JWT_SECRET));
 // Posts
 app.use('/api/posts', createPostRoutes(prisma, JWT_SECRET));
 
+// Media library
+app.use('/api/media', createMediaRoutes(prisma, JWT_SECRET, uploadRoot));
+
 // Usuários
 app.use('/api/users', createUserRoutes(prisma, JWT_SECRET));
+
+// Categorias e Tags (para o editor)
+app.use('/api/categories', createCategoryRoutes(prisma, JWT_SECRET));
 
 // ============================================
 // TRATAMENTO DE ERROS

@@ -7,21 +7,51 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum MediaStatus {
+  active
+  trash
+  unattached
+}
+
+enum MediaKind {
+  image
+  document
+  video
+  audio
+  other
+}
+
 model Post {
   id          String   @id @default(uuid()) @db.Uuid
   title       String
+  cover       String?
+  type        String   @default("post")
   slug        String   @unique
   content     String   @db.Text
   excerpt     String   @db.Text
   status      String   @default("draft")
   authorId    String   @db.Uuid
+  autosaveAt  DateTime?
+  deletedAt   DateTime?
+  wordCount   Int      @default(0)
+  linkCount   Int      @default(0)
+  imageCount  Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   publishedAt DateTime?
+  scheduledAt DateTime?
 
   author         User           @relation(fields: [authorId], references: [id])
   postCategories PostCategory[]
   postTags       PostTag[]
+  postMedia      PostMedia[]
+  revisions      PostRevision[]
+
+  @@index([status])
+  @@index([type])
+  @@index([authorId])
+  @@index([publishedAt])
+  @@index([createdAt])
 }
 
 model Category {
@@ -81,7 +111,73 @@ model User {
   updatedAt    DateTime @updatedAt
 
   posts                 Post[]
+  mediaUploads          Media[]
   applicationPasswords ApplicationPassword[]
+}
+
+model Media {
+  id            String      @id @default(uuid()) @db.Uuid
+  fileName      String      @map("file_name")
+  originalName  String      @map("original_name")
+  filePath      String      @map("file_path")
+  fileUrl       String      @map("file_url")
+  fileSize      BigInt      @map("file_size")
+  mimeType      String      @map("mime_type")
+  fileExtension String      @map("file_extension")
+  width         Int?
+  height        Int?
+  duration      Int?
+  altText       String?     @map("alt_text")
+  title         String?
+  caption       String?
+  description   String?
+  uploadedBy    String?     @map("uploaded_by") @db.Uuid
+  folder        String      @default("/")
+  status        MediaStatus @default(active)
+  kind          MediaKind   @default(other)
+  thumbnails    Json?
+  metadata      Json?
+  shortcode     String?
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+
+  uploader User? @relation(fields: [uploadedBy], references: [id], onDelete: SetNull)
+  postMedia PostMedia[]
+
+  @@index([fileName], map: "idx_media_file_name")
+  @@index([mimeType], map: "idx_media_mime_type")
+  @@index([uploadedBy], map: "idx_media_uploaded_by")
+  @@index([status], map: "idx_media_status")
+  @@index([createdAt], map: "idx_media_created_at")
+  @@index([kind], map: "idx_media_kind")
+}
+
+model PostMedia {
+  postId    String   @db.Uuid
+  mediaId   String   @db.Uuid
+  createdAt DateTime @default(now())
+
+  post  Post  @relation(fields: [postId], references: [id], onDelete: Cascade)
+  media Media @relation(fields: [mediaId], references: [id], onDelete: Cascade)
+
+  @@id([postId, mediaId])
+  @@index([mediaId])
+}
+
+model PostRevision {
+  id        String   @id @default(uuid()) @db.Uuid
+  postId    String   @db.Uuid
+  title     String
+  content   String   @db.Text
+  excerpt   String   @db.Text
+  status    String
+  createdBy String?  @db.Uuid
+  createdAt DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([createdAt])
 }
 
 model ApplicationPassword {

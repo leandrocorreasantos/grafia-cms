@@ -4,6 +4,8 @@ import { IUserRepository } from '../../../src/domain/user/IUserRepository';
 import { User } from '../../../src/domain/user/User';
 import { UserRole } from '../../../src/domain/user/UserRole';
 import { ConflictError } from '../../../src/domain/errors/DomainError';
+import { WeakPasswordError } from '../../../src/domain/user/User';
+import bcrypt from 'bcryptjs';
 
 const mockUserRepository: jest.Mocked<IUserRepository> = {
   save: jest.fn(),
@@ -20,6 +22,7 @@ describe('CreateUserUseCase', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.spyOn(bcrypt, 'hash').mockResolvedValue('hashed-password-mock');
     useCase = new CreateUserUseCase(mockUserRepository);
   });
 
@@ -65,17 +68,17 @@ describe('CreateUserUseCase', () => {
     expect(mockUserRepository.save).not.toHaveBeenCalled();
   });
 
-  it('deve lancar erro para senha curta (< 8 caracteres)', async () => {
+  it('deve lancar WeakPasswordError para senha curta (< 8 caracteres)', async () => {
     mockUserRepository.findByEmail.mockResolvedValue(null);
 
-    await expect(useCase.execute({ ...validInput, password: '123' })).rejects.toThrow('senha');
+    await expect(useCase.execute({ ...validInput, password: '123' })).rejects.toThrow(WeakPasswordError);
     expect(mockUserRepository.save).not.toHaveBeenCalled();
   });
 
-  it('deve lancar erro para senha vazia', async () => {
+  it('deve lancar WeakPasswordError para senha vazia', async () => {
     mockUserRepository.findByEmail.mockResolvedValue(null);
 
-    await expect(useCase.execute({ ...validInput, password: '' })).rejects.toThrow('senha');
+    await expect(useCase.execute({ ...validInput, password: '' })).rejects.toThrow(WeakPasswordError);
   });
 
   it('deve usar AUTHOR como role padrao', async () => {
@@ -92,5 +95,13 @@ describe('CreateUserUseCase', () => {
     const user = await useCase.execute({ ...validInput, role: UserRole.EDITOR });
 
     expect(user.getRole()).toBe(UserRole.EDITOR);
+  });
+
+  it('deve chamar bcrypt.hash com salt rounds 12', async () => {
+    mockUserRepository.findByEmail.mockResolvedValue(null);
+
+    await useCase.execute(validInput);
+
+    expect(bcrypt.hash).toHaveBeenCalledWith(validInput.password, 12);
   });
 });

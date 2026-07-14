@@ -1,11 +1,13 @@
 import { Post } from '../../../src/domain/post/Post';
 import { PostStatus } from '../../../src/domain/post/PostStatus';
 import { v4 as uuidv4 } from 'uuid';
+import { describe, expect, it } from '@jest/globals';
 
 describe('Post - Entidade de Dominio', () => {
   const validData = {
     id: uuidv4(),
     title: 'Titulo do Post',
+    cover: 'https://cdn.exemplo.com/capa.jpg',
     content: 'Conteudo do post com pelo menos 10 caracteres!',
     excerpt: 'Resumo do post',
     slug: 'titulo-do-post',
@@ -60,6 +62,12 @@ describe('Post - Entidade de Dominio', () => {
       expect(post.title).toBe('Novo Titulo');
       expect(post.content).toBe('Novo conteudo com pelo menos 10 caracteres!');
     });
+
+    it('deve atualizar cover quando informado', () => {
+      const post = new Post(validData);
+      post.update(validData.title, validData.content, 'https://cdn.exemplo.com/nova-capa.webp');
+      expect(post.cover).toBe('https://cdn.exemplo.com/nova-capa.webp');
+    });
   });
 
   describe('publish()', () => {
@@ -73,6 +81,61 @@ describe('Post - Entidade de Dominio', () => {
       const post = new Post({ ...validData, status: PostStatus.PUBLISHED });
       post.publish();
       expect(post.status).toBe(PostStatus.PUBLISHED);
+    });
+  });
+
+  describe('updateAdvanced()', () => {
+    it('deve atualizar apenas titulo parcialmente', () => {
+      const post = new Post(validData);
+      post.updateAdvanced({ title: 'Titulo Atualizado' });
+      expect(post.title).toBe('Titulo Atualizado');
+      expect(post.content).toBe(validData.content);
+    });
+
+    it('deve atualizar status para PUBLISHED', () => {
+      const post = new Post(validData);
+      post.updateAdvanced({ status: PostStatus.PUBLISHED });
+      expect(post.status).toBe(PostStatus.PUBLISHED);
+    });
+
+    it('deve atualizar categoryIds e tagIds deduplicando', () => {
+      const cat1 = uuidv4();
+      const cat2 = uuidv4();
+      const post = new Post(validData);
+      post.updateAdvanced({ categoryIds: [cat1, cat1, cat2] });
+      const json = post.toJSON();
+      expect(json.categoryIds).toEqual([cat1, cat2]);
+    });
+  });
+
+  describe('markTrash()', () => {
+    it('deve marcar post como lixeira', () => {
+      const post = new Post(validData);
+      post.markTrash();
+      expect(post.status).toBe(PostStatus.TRASH);
+      expect(post.deletedAt).toBeInstanceOf(Date);
+    });
+  });
+
+  describe('restoreFromTrash()', () => {
+    it('deve restaurar post da lixeira para DRAFT', () => {
+      const post = new Post(validData);
+      post.markTrash();
+      post.restoreFromTrash();
+      expect(post.status).toBe(PostStatus.DRAFT);
+      expect(post.deletedAt).toBeUndefined();
+    });
+  });
+
+  describe('touchAutosave()', () => {
+    it('deve atualizar autosaveAt', () => {
+      const post = new Post(validData);
+      const before = post.autosaveAt;
+      post.touchAutosave();
+      expect(post.autosaveAt).toBeInstanceOf(Date);
+      if (before) {
+        expect(post.autosaveAt!.getTime()).toBeGreaterThanOrEqual(before.getTime());
+      }
     });
   });
 

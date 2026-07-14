@@ -1,5 +1,7 @@
 export enum PostStatus {
     DRAFT = 'draft',
+    PENDING = 'pending',
     PUBLISHED = 'published',
-    ARCHIVED = 'archived'
+    ARCHIVED = 'archived',
+    TRASH = 'trash'
 }

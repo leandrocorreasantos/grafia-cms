@@ -31,7 +31,7 @@ describe('JwtService', () => {
         role: UserRole.EDITOR,
       });
 
-      const decoded = jwt.verify(token, SECRET) as any;
+      const decoded = jwtService.verifyToken(token);
       expect(decoded.type).toBe('user');
     });
 
@@ -44,7 +44,7 @@ describe('JwtService', () => {
         appName: 'Zapier',
       });
 
-      const decoded = jwt.verify(token, SECRET) as any;
+      const decoded = jwtService.verifyToken(token);
       expect(decoded.appName).toBe('Zapier');
       expect(decoded.type).toBe('application');
     });

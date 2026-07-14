@@ -25,18 +25,8 @@ type LoginUserRepositoryMock = IUserRepository & {
   updateApplicationPasswordLastUsed: (id: string) => Promise<void>;
 };
 
-function getRequiredTestEnv(name: string): string {
-  const value = process.env[name];
-
-  if (!value) {
-    throw new Error(`Missing ${name} in .env.test`);
-  }
-
-  return value;
-}
-
-const TEST_USER_PASSWORD = getRequiredTestEnv('LOGIN_TEST_USER_PASSWORD');
-const TEST_APPLICATION_PASSWORD = getRequiredTestEnv('LOGIN_TEST_APPLICATION_PASSWORD');
+let TEST_USER_PASSWORD: string;
+let TEST_APPLICATION_PASSWORD: string;
 
 // Mock do JwtService
 const mockJwtService = {
@@ -72,6 +62,15 @@ function createUser(overrides: Partial<UserData> = {}): User {
     ...overrides,
   });
 }
+
+beforeAll(() => {
+  TEST_USER_PASSWORD = process.env.LOGIN_TEST_USER_PASSWORD || '';
+  TEST_APPLICATION_PASSWORD = process.env.LOGIN_TEST_APPLICATION_PASSWORD || '';
+
+  if (!TEST_USER_PASSWORD || !TEST_APPLICATION_PASSWORD) {
+    throw new Error('Missing LOGIN_TEST_USER_PASSWORD and/or LOGIN_TEST_APPLICATION_PASSWORD in .env.test');
+  }
+});
 
 describe('LoginUseCase', () => {
   let useCase: LoginUseCase;

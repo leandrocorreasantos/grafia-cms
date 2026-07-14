@@ -4,9 +4,16 @@ import { NotFoundError } from '../../domain/errors/DomainError';
 export class DeletePostUseCase {
   constructor(private readonly postRepository: IPostRepository) {}
 
-  async execute(id: string): Promise<void> {
+  async execute(id: string, permanent = false): Promise<void> {
     const post = await this.postRepository.findById(id);
     if (!post) throw new NotFoundError('Post', id);
-    await this.postRepository.delete(id);
+
+    if (permanent) {
+      await this.postRepository.hardDelete(id);
+      return;
+    }
+
+    post.markTrash();
+    await this.postRepository.save(post);
   }
 }

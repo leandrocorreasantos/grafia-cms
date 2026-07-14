@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editor - Grafia CMS</title>
+  <meta name="description" content="Editor de conteúdo WYSIWYG do Grafia CMS">
+  <link rel="stylesheet" href="css/editor.css">
+  <link rel="stylesheet" href="css/media-modal.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="app">
+    <!-- ===== BARRA SUPERIOR ===== -->
+    <header class="editor-topbar">
+      <div class="topbar-left">
+        <a href="../dashboard" class="topbar-back" title="Voltar ao painel">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5m7-7l-7 7 7 7"/></svg>
+        </a>
+        <div class="topbar-post-status">
+          <span class="status-indicator" id="statusIndicator" data-status="draft">Rascunho</span>
+        </div>
+      </div>
+      <div class="topbar-center">
+        <span class="autosave-indicator" id="autosaveIndicator">✓ Salvo</span>
+      </div>
+      <div class="topbar-right">
+        <button class="btn btn-ghost" id="btnPreview" title="Pré-visualizar (Ctrl+Shift+P)" aria-label="Pré-visualizar">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          Prévia
+        </button>
+        <button class="btn btn-ghost" id="btnFullscreen" title="Tela cheia (F11)" aria-label="Alternar tela cheia">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3"/></svg>
+        </button>
+        <div class="topbar-actions">
+          <button class="btn btn-outline" id="btnSaveDraft">Salvar Rascunho</button>
+          <button class="btn btn-primary" id="btnPublish">Publicar</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="editor-layout">
+      <!-- ===== ÁREA PRINCIPAL ===== -->
+      <main class="editor-main">
+        <!-- Título -->
+        <div class="editor-title-wrap">
+          <input type="text" class="editor-title" id="postTitle"
+                 placeholder="Adicione um título"
+                 autocomplete="off" spellcheck="true"
+                 aria-label="Título do post">
+        </div>
+
+        <!-- ===== TOOLBAR ===== -->
+        <div class="editor-toolbar" id="editorToolbar" role="toolbar" aria-label="Barra de formatação">
+          <div class="toolbar-group">
+            <button class="toolbar-btn" data-cmd="bold" title="Negrito (Ctrl+B)" aria-label="Negrito">
+              <svg viewBox="0 0 24 24"><path d="M15.6 10.79c.97-.67 1.65-1.77 1.65-2.79 0-2.26-1.75-4-4-4H7v14h7.04c2.09 0 3.71-1.7 3.71-3.79 0-1.52-.86-2.82-2.15-3.42zM10 6.5h3c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-3v-3zm3.5 9H10v-3h3.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5z"/></svg>
+            </button>
+            <button class="toolbar-btn" data-cmd="italic" title="Itálico (Ctrl+I)" aria-label="Itálico">
+              <svg viewBox="0 0 24 24"><path d="M10 4v3h2.21l-3.42 8H6v3h8v-3h-2.21l3.42-8H18V4z"/></svg>
+            </button>
+            <button class="toolbar-btn" data-cmd="underline" title="Sublinhado (Ctrl+U)" aria-label="Sublinhado">
+              <svg viewBox="0 0 24 24"><path d="M12 17c3.31 0 6-2.69 6-6V3h-2.5v8c0 1.93-1.57 3.5-3.5 3.5S8.5 12.93 8.5 11V3H6v8c0 3.31 2.69 6 6 6zm-7 2v2h14v-2H5z"/></svg>
+            </button>
+            <button class="toolbar-btn" data-cmd="strikeThrough" title="Tachado" aria-label="Tachado">
+              <svg viewBox="0 0 24 24"><path d="M10 19h4v-3h-4v3zM5 4v3h5v3h4V7h5V4H5zM3 14h18v-2H3v2z"/></svg>
+            </button>
+          </div>
+
+          <div class="toolbar-separator"></div>
+
+          <div class="toolbar-group">
+            <button class="toolbar-btn" data-cmd="formatBlock" data-value="p" title="Parágrafo" aria-label="Parágrafo">
+              <svg viewBox="0 0 24 24"><path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/></svg>
+            </button>
+            <button class="toolbar-btn" data-cmd="formatBlock" data-value="h2" title="Título 2" aria-label="Título 2">
+              <span class="toolbar-btn-text">H2</span>
+            </button>
+            <button class="toolbar-btn" data-cmd="formatBlock" data-value="h3" title="Título 3" aria-label="Título 3">
+              <span class="toolbar-btn-text">H3</span>
+            </button>
+            <button class="toolbar-btn" data-cmd="formatBlock" data-value="h4" title="Título 4" aria-label="Título 4">
+              <span class="toolbar-btn-text">H4</span>
+            </button>
+          </div>
+
+          <div class="toolbar-separator"></div>
+
+          <div class="toolbar-group">
+            <button class="toolbar-btn" data-cmd="justifyLeft" title="Alinhar à esquerda" aria-label="Alinhar à esquerda">
+              <svg viewBox="0 0 24 24"><path d="M15 15H3v2h12v-2zm0-8H3v2h12V7zM3 13h18v-2H3v2zm0 8h18v-2H3v2zM3 3v2h18V3H3z"/></svg>
+            </button>
+            <button class="toolbar-btn" data-cmd="justifyCenter" title="Centralizar" aria-label="Centralizar">
+              <svg viewBox="0 0 24 24"><path d="M7 15v2h10v-2H7zm-4 6h18v-2H3v2zm0-8h18v-2H3v2zm4-6v2h10V7H7zM3 3v2h18V3H3z"/></svg>
+            </button>
+            <button class="toolbar-btn" data-cmd="justifyRight" title="Alinhar à direita" aria-label="Alinhar à direita">
+              <svg viewBox="0 0 24 24"><path d="M3 21h18v-2H3v2zm6-4h12v-2H9v2zm-6-4h18v-2H3v2zm6-4h12V7H9v2zM3 3v2h18V3H3z"/></svg>
+            </button>
+            <button class="toolbar-btn" data-cmd="justifyFull" title="Justificar" aria-label="Justificar">
+              <svg viewBox="0 0 24 24"><path d="M3 21h18v-2H3v2zm0-4h18v-2H3v2zm0-4h18v-2H3v2zm0-4h18V7H3v2zm0-6v2h18V3H3z"/></svg>
+            </button>
+          </div>
+
+          <div class="toolbar-separator"></div>
+
+          <div class="toolbar-group">
+            <button class="toolbar-btn" data-cmd="insertUnorderedList" title="Lista não ordenada" aria-label="Lista não ordenada">
+              <svg viewBox="0 0 24 24"><path d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zm0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5zm0 12c-.83 0-1.5.68-1.5 1.5s.68 1.5 1.5 1.5 1.5-.68 1.5-1.5-.67-1.5-1.5-1.5zM7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7z"/></svg>
+            </button>
+            <button class="toolbar-btn" data-cmd="insertOrderedList" title="Lista ordenada" aria-label="Lista ordenada">
+              <svg viewBox="0 0 24 24"><path d="M2 17h2v.5H3v1h1v.5H2v1h3v-4H2v1zm1-9h1V4H2v1h1v3zm-1 3h1.8L2 13.1v.9h3v-1H3.2L5 10.9V10H2v1zm5-6v2h14V5H7zm0 14h14v-2H7v2zm0-6h14v-2H7v2z"/></svg>
+            </button>
+          </div>
+
+          <div class="toolbar-separator"></div>
+
+          <div class="toolbar-group">
+            <button class="toolbar-btn" data-cmd="createLink" title="Inserir link (Ctrl+K)" aria-label="Inserir link">
+              <svg viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+            </button>
+            <button class="toolbar-btn" data-cmd="unlink" title="Remover link" aria-label="Remover link">
+              <svg viewBox="0 0 24 24"><path d="M17 7h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1 0 1.43-.98 2.63-2.31 2.98l1.46 1.46C20.88 15.61 22 13.95 22 12c0-2.76-2.24-5-5-5zm-1 4h-2.19l2 2H16v-2zM2 4.27l3.11 3.11C3.29 8.12 2 9.91 2 12c0 2.76 2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1 0-1.59 1.21-2.9 2.76-3.07L8.73 11H8v2h2.73L13 15.27V17h1.73l4.01 4.01 1.41-1.41L3.41 2.86 2 4.27z"/></svg>
+            </button>
+            <button class="toolbar-btn" data-cmd="formatBlock" data-value="blockquote" title="Citação" aria-label="Citação">
+              <svg viewBox="0 0 24 24"><path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/></svg>
+            </button>
+            <button class="toolbar-btn" data-cmd="formatBlock" data-value="pre" title="Bloco de código" aria-label="Bloco de código">
+              <svg viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+            </button>
+          </div>
+
+          <div class="toolbar-separator"></div>
+
+          <div class="toolbar-group">
+            <button class="toolbar-btn toolbar-btn-media" id="btnOpenMedia" title="Abrir biblioteca de mídia" aria-label="Abrir biblioteca de mídia">
+              <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+              <span>Mídia</span>
+            </button>
+          </div>
+
+          <div class="toolbar-separator"></div>
+
+          <div class="toolbar-group">
+            <button class="toolbar-btn" data-cmd="undo" title="Desfazer (Ctrl+Z)" aria-label="Desfazer">
+              <svg viewBox="0 0 24 24"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg>
+            </button>
+            <button class="toolbar-btn" data-cmd="redo" title="Refazer (Ctrl+Shift+Z)" aria-label="Refazer">
+              <svg viewBox="0 0 24 24"><path d="M18.4 10.6C16.55 9 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22l2.37.78c1.05-3.19 4.06-5.5 7.6-5.5 1.96 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z"/></svg>
+            </button>
+            <button class="toolbar-btn" data-cmd="removeFormat" title="Limpar formatação" aria-label="Limpar formatação">
+              <svg viewBox="0 0 24 24"><path d="M3.27 5L2 6.27l6.97 6.97L6.5 19h3l1.57-3.66L16.73 21 18 19.73 3.55 5.27 3.27 5zM6 5v.18L8.82 8h2.4l-.72 1.68 2.1 2.1L14.21 8H20V5H6z"/></svg>
+            </button>
+          </div>
+
+          <div class="toolbar-separator"></div>
+
+          <div class="toolbar-group">
+            <button class="toolbar-btn" id="btnHtmlMode" title="Alternar para HTML" aria-label="Alternar modo HTML">
+              <svg viewBox="0 0 24 24"><path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/></svg>
+              <span>HTML</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ===== ÁREA DE EDIÇÃO ===== -->
+        <div class="editor-content-wrap">
+          <div class="editor-content" id="editorContent"
+               contenteditable="true"
+               role="textbox"
+               aria-multiline="true"
+               aria-label="Conteúdo do post"
+               spellcheck="true"
+               data-placeholder="Comece a escrever...">
+          </div>
+          <textarea class="editor-textarea" id="editorTextarea"
+                    aria-label="Código HTML do conteúdo"
+                    spellcheck="false"
+                    style="display:none"></textarea>
+        </div>
+
+        <!-- ===== RODAPÉ DO EDITOR ===== -->
+        <footer class="editor-footer">
+          <div class="editor-stats">
+            <span class="stat-item" id="statWords" title="Palavras">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              <span id="wordCount">0</span> palavras
+            </span>
+            <span class="stat-item" id="statChars" title="Caracteres">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+              <span id="charCount">0</span> caracteres
+            </span>
+            <span class="stat-item" id="statImages" title="Imagens">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <span id="imageCount">0</span> imagens
+            </span>
+            <span class="stat-item" id="statLinks" title="Links">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+              <span id="linkCount">0</span> links
+            </span>
+          </div>
+          <div class="editor-footer-right">
+            <span class="last-saved" id="lastSaved">Último salvamento: --</span>
+          </div>
+        </footer>
+      </main>
+
+      <!-- ===== BARRA LATERAL ===== -->
+      <aside class="editor-sidebar" id="editorSidebar" aria-label="Configurações do post">
+        <!-- Status e Datas -->
+        <section class="sidebar-section">
+          <h3 class="sidebar-title">Situação</h3>
+          <div class="sidebar-field">
+            <label for="postStatus">Status</label>
+            <select id="postStatus" class="sidebar-select">
+              <option value="draft">Rascunho</option>
+              <option value="published">Publicado</option>
+              <option value="archived">Arquivado</option>
+            </select>
+          </div>
+          <div class="sidebar-field">
+            <label for="postPublishDate">Publicar em</label>
+            <input type="datetime-local" id="postPublishDate" class="sidebar-input">
+          </div>
+        </section>
+
+        <!-- Slug -->
+        <section class="sidebar-section">
+          <h3 class="sidebar-title">URL</h3>
+          <div class="sidebar-field">
+            <div class="slug-preview" id="slugPreview">/posts/<span id="slugText">slug-do-post</span></div>
+            <input type="text" id="postSlug" class="sidebar-input sidebar-input-sm" placeholder="slug-do-post">
+            <button class="btn btn-ghost btn-xs" id="btnEditSlug">✏️ Editar</button>
+          </div>
+        </section>
+
+        <!-- Imagem Destacada -->
+        <section class="sidebar-section">
+          <h3 class="sidebar-title">Imagem Destacada</h3>
+          <div class="featured-image-area" id="featuredImageArea">
+            <div class="featured-image-placeholder" id="featuredImagePlaceholder">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <span>Clique para definir</span>
+            </div>
+            <div class="featured-image-preview" id="featuredImagePreview" style="display:none">
+              <img id="featuredImageImg" alt="Imagem destacada">
+              <button class="featured-image-remove" id="btnRemoveFeatured" title="Remover imagem destacada">&times;</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Categorias -->
+        <section class="sidebar-section">
+          <h3 class="sidebar-title">Categorias</h3>
+          <div class="sidebar-field">
+            <div class="tag-list" id="categoryList"></div>
+            <select id="categorySelect" class="sidebar-select" aria-label="Adicionar categoria">
+              <option value="">Selecione uma categoria...</option>
+            </select>
+          </div>
+        </section>
+
+        <!-- Tags -->
+        <section class="sidebar-section">
+          <h3 class="sidebar-title">Tags</h3>
+          <div class="sidebar-field">
+            <div class="tag-list" id="tagList"></div>
+            <div class="tag-input-wrap">
+              <input type="text" id="tagInput" class="sidebar-input" placeholder="Digite e pressione Enter" aria-label="Adicionar tag">
+            </div>
+          </div>
+        </section>
+
+        <!-- Resumo -->
+        <section class="sidebar-section">
+          <h3 class="sidebar-title">Resumo</h3>
+          <div class="sidebar-field">
+            <textarea id="postExcerpt" class="sidebar-textarea" rows="4"
+                      placeholder="Resumo do post (se vazio, será gerado automaticamente)"
+                      aria-label="Resumo do post"></textarea>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </div>
+
+  <!-- ===== MODAL PRÉ-VISUALIZAÇÃO ===== -->
+  <div class="modal-overlay" id="previewModal" role="dialog" aria-modal="true" aria-label="Pré-visualização do post" style="display:none">
+    <div class="modal modal-preview">
+      <div class="modal-header">
+        <h2>Pré-visualização</h2>
+        <button class="modal-close" data-close="previewModal" aria-label="Fechar">&times;</button>
+      </div>
+      <div class="modal-body">
+        <article class="preview-content" id="previewContent"></article>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL LINK ===== -->
+  <div class="modal-overlay" id="linkModal" role="dialog" aria-modal="true" aria-label="Inserir link" style="display:none">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <h2>Inserir Link</h2>
+        <button class="modal-close" data-close="linkModal" aria-label="Fechar">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="linkUrl">URL:</label>
+          <input type="url" id="linkUrl" class="sidebar-input" placeholder="https://..." autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label for="linkText">Texto:</label>
+          <input type="text" id="linkText" class="sidebar-input" placeholder="Texto do link" autocomplete="off">
+        </div>
+        <div class="form-row">
+          <label class="checkbox-label">
+            <input type="checkbox" id="linkTarget"> Abrir em nova aba (target=_blank)
+          </label>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-outline" data-close="linkModal">Cancelar</button>
+          <button class="btn btn-primary" id="btnLinkConfirm">Inserir</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL BIBLIOTECA DE MÍDIA ===== -->
+  <div class="modal-overlay" id="mediaModal" role="dialog" aria-modal="true" aria-label="Biblioteca de mídia" style="display:none">
+    <div class="modal modal-media">
+      <div class="modal-header">
+        <h2>Biblioteca de Mídia</h2>
+        <div class="modal-header-actions">
+          <button class="btn btn-sm btn-primary" id="btnInsertMedia">
+            Inserir no post
+          </button>
+          <button class="modal-close" data-close="mediaModal" aria-label="Fechar">&times;</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <!-- Barra de busca e filtros -->
+        <div class="media-toolbar">
+          <div class="media-search">
+            <svg class="media-search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="search" id="mediaSearch" class="media-search-input" placeholder="Buscar arquivos..." aria-label="Buscar arquivos">
+          </div>
+          <div class="media-filters">
+            <select id="mediaKindFilter" class="media-filter-select" aria-label="Filtrar por tipo">
+              <option value="all">Todos</option>
+              <option value="image">Imagens</option>
+              <option value="video">Vídeos</option>
+              <option value="audio">Áudios</option>
+              <option value="document">Documentos</option>
+            </select>
+            <button class="btn btn-ghost btn-sm" id="btnMediaUpload" title="Fazer upload">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Upload
+            </button>
+          </div>
+        </div>
+
+        <!-- Dropzone para upload -->
+        <div class="media-dropzone" id="mediaDropzone" style="display:none">
+          <div class="dropzone-content">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <p>Arraste arquivos aqui ou clique para selecionar</p>
+            <input type="file" id="mediaFileInput" multiple accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.txt" style="display:none">
+          </div>
+        </div>
+
+        <!-- Grid de mídia -->
+        <div class="media-grid" id="mediaGrid" role="listbox" aria-label="Arquivos de mídia">
+          <div class="media-loading">Carregando...</div>
+        </div>
+
+        <!-- Paginação -->
+        <div class="media-pagination" id="mediaPagination">
+          <button class="btn btn-ghost btn-sm" id="mediaPrevPage" disabled>Anterior</button>
+          <span class="media-page-info" id="mediaPageInfo">Página 1 de 1</span>
+          <button class="btn btn-ghost btn-sm" id="mediaNextPage" disabled>Próxima</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL DETALHES DA MÍDIA ===== -->
+  <div class="modal-overlay" id="mediaDetailModal" role="dialog" aria-modal="true" aria-label="Detalhes do arquivo" style="display:none">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <h2>Detalhes do Arquivo</h2>
+        <button class="modal-close" data-close="mediaDetailModal" aria-label="Fechar">&times;</button>
+      </div>
+      <div class="modal-body" id="mediaDetailBody">
+        <!-- Preenchido dinamicamente -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/media-api.js"></script>
+  <script src="js/editor-core.js"></script>
+</body>
+</html>

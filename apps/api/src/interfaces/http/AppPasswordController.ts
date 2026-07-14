@@ -100,6 +100,14 @@ export class AppPasswordController {
       }
 
       const { id } = req.params;
+
+      // Validar que o ID e um UUID valido antes de consultar o banco
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(id)) {
+        res.status(404).json({ error: 'Senha de aplicacao nao encontrada' });
+        return;
+      }
+
       const record = await (this.prisma as any).applicationPassword.findUnique({
         where: { id },
       });
@@ -120,3 +128,4 @@ export class AppPasswordController {
     }
   }
 }
+

@@ -12,4 +12,12 @@ describe('PostStatus - Value Object', () => {
   it('deve ter ARCHIVED como status arquivado', () => {
     expect(PostStatus.ARCHIVED).toBe('archived');
   });
+
+  it('deve ter PENDING como status pendente', () => {
+    expect(PostStatus.PENDING).toBe('pending');
+  });
+
+  it('deve ter TRASH como status lixeira', () => {
+    expect(PostStatus.TRASH).toBe('trash');
+  });
 });

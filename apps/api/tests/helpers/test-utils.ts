@@ -14,13 +14,17 @@ config();
 const JWT_SECRET = process.env.JWT_SECRET || 'test-jwt-secret';
 
 /**
- * Cria uma instância do app Express para testes.
+ * Cria uma instância do app Express para testes com rate-limit desabilitado.
  * Usa um PrismaClient compartilhado.
  */
 export function createTestApp(prisma: PrismaClient) {
   const app = express();
   app.use(cors());
   app.use(express.json());
+
+  // Desabilitar rate-limit nos testes para evitar bloqueios.
+  // As funcoes de rate-limit sao substituidas por middlewares no-op.
+  process.env.DISABLE_RATE_LIMIT = 'true';
 
   // Rotas
   app.use('/api/auth', createAuthRoutes(prisma, JWT_SECRET));
@@ -99,3 +103,4 @@ export async function seedEditor(prisma: PrismaClient) {
     },
   });
 }
+
